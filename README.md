@@ -146,14 +146,10 @@ cover: "Audiobooks/_covers/Patrick_Rothfuss_-_Der_Name_des_Windes.jpg"
 series: "Die Königsmörder-Chronik - Buch 1"
 ```
 
-## Description
-
-[API description will be inserted here]
-
 ## Notes
 
 <!-- Add your notes here -->
-```
+
 
 ### Workflow Examples
 
