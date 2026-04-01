@@ -1,4 +1,4 @@
-import {App, MarkdownPostProcessorContext} from "obsidian";
+import {App, MarkdownPostProcessorContext, TFile} from "obsidian";
 
 /**
  * Interface for audiobook card data parsed from code block
@@ -13,6 +13,15 @@ export interface AudiobookCardData {
 	rating?: number;
 	cover?: string;
 	series?: string;
+	publishedDate?: string;
+	language?: string;
+	subtitle?: string;
+	description?: string;
+	seriesPosition?: string;
+	isbn?: string;
+	asin?: string;
+	url?: string;
+	linkedFile?: string;  // Path to another note to read frontmatter from
 }
 
 /**
@@ -20,6 +29,167 @@ export interface AudiobookCardData {
  */
 export class AudiobookCardRenderer {
 	constructor(private app: App) {}
+	
+	/**
+	 * Extract cover path from various formats (including wikilinks)
+	 */
+	private extractCoverPath(coverValue: string): string {
+		if (!coverValue) return '';
+		
+		// Remove wikilink format [[image.jpg]] -> image.jpg
+		const wikilinkMatch = coverValue.match(/\[\[([^\]]+)\]\]/);
+		if (wikilinkMatch && wikilinkMatch[1]) {
+			return wikilinkMatch[1];
+		}
+		
+		return coverValue;
+	}
+	
+	/**
+	 * Extract audiobook data from file frontmatter
+	 */
+	private extractFromFrontmatter(ctx: MarkdownPostProcessorContext): AudiobookCardData {
+		const data: AudiobookCardData = {};
+		
+		// Get the file from the context
+		const file = this.app.vault.getAbstractFileByPath(ctx.sourcePath);
+		if (!file || !(file instanceof TFile)) {
+			return data;
+		}
+		
+		// Get cached metadata
+		const cache = this.app.metadataCache.getFileCache(file);
+		if (!cache || !cache.frontmatter) {
+			return data;
+		}
+		
+		const fm = cache.frontmatter;
+		
+		// Map frontmatter fields to AudiobookCardData
+		if (fm.title) data.title = String(fm.title);
+		if (fm.subtitle) data.subtitle = String(fm.subtitle);
+		
+		// Handle author (can be string or array)
+		if (fm.author) {
+			if (Array.isArray(fm.author)) {
+				data.author = fm.author.join(', ');
+			} else {
+				data.author = String(fm.author);
+			}
+		}
+		
+		// Handle narrator (can be string or array)
+		if (fm.narrator) {
+			if (Array.isArray(fm.narrator)) {
+				data.narrator = fm.narrator.join(', ');
+			} else {
+				data.narrator = String(fm.narrator);
+			}
+		}
+		
+		if (fm.duration) data.duration = String(fm.duration);
+		if (fm.publisher) data.publisher = String(fm.publisher);
+		if (fm.published) data.publishedDate = String(fm.published);
+		if (fm.language) data.language = String(fm.language);
+		if (fm.description) data.description = String(fm.description);
+		
+		// Handle genre (can be string or array)
+		if (fm.genre) {
+			if (Array.isArray(fm.genre)) {
+				data.genre = fm.genre.join(', ');
+			} else {
+				data.genre = String(fm.genre);
+			}
+		}
+		
+		// Handle series
+		if (fm.series) data.series = String(fm.series);
+		if (fm.seriesPosition) data.seriesPosition = String(fm.seriesPosition);
+		
+		// Handle rating
+		if (fm.rating !== undefined) {
+			data.rating = typeof fm.rating === 'number' ? fm.rating : parseFloat(String(fm.rating));
+		}
+		
+		// Handle cover - check multiple possible field names
+		if (fm.cover) {
+			data.cover = this.extractCoverPath(String(fm.cover));
+		} else if (fm.coverUrl) {
+			data.cover = this.extractCoverPath(String(fm.coverUrl));
+		} else if (fm.coverLocalPath) {
+			data.cover = this.extractCoverPath(String(fm.coverLocalPath));
+		}
+		
+		// Additional identifiers
+		if (fm.isbn) data.isbn = String(fm.isbn);
+		if (fm.isbn13) data.isbn = String(fm.isbn13);
+		if (fm.asin) data.asin = String(fm.asin);
+		if (fm.url) data.url = String(fm.url);
+		
+		return data;
+	}
+	
+	/**
+	 * Extract audiobook data from a linked note's frontmatter
+	 */
+	private extractFromLinkedFile(linkPath: string): AudiobookCardData {
+		const data: AudiobookCardData = {};
+
+		const file = this.app.metadataCache.getFirstLinkpathDest(linkPath, '');
+		if (!file || !(file instanceof TFile)) {
+			return { title: `⚠️ File not found: "${linkPath}"` };
+		}
+
+		const cache = this.app.metadataCache.getFileCache(file);
+		if (!cache || !cache.frontmatter) {
+			return { title: `⚠️ No frontmatter in: "${linkPath}"` };
+		}
+
+		const fm = cache.frontmatter;
+
+		if (fm.title) data.title = String(fm.title);
+		if (fm.subtitle) data.subtitle = String(fm.subtitle);
+
+		if (fm.author) {
+			data.author = Array.isArray(fm.author) ? fm.author.join(', ') : String(fm.author);
+		}
+		if (fm.narrator) {
+			data.narrator = Array.isArray(fm.narrator) ? fm.narrator.join(', ') : String(fm.narrator);
+		}
+
+		if (fm.duration) data.duration = String(fm.duration);
+		if (fm.publisher) data.publisher = String(fm.publisher);
+		if (fm.published) data.publishedDate = String(fm.published);
+		if (fm.language) data.language = String(fm.language);
+		if (fm.description) data.description = String(fm.description);
+
+		if (fm.genre) {
+			data.genre = Array.isArray(fm.genre) ? fm.genre.join(', ') : String(fm.genre);
+		}
+
+		if (fm.series) data.series = String(fm.series);
+		if (fm.seriesPosition) data.seriesPosition = String(fm.seriesPosition);
+
+		if (fm.rating !== undefined) {
+			data.rating = typeof fm.rating === 'number' ? fm.rating : parseFloat(String(fm.rating));
+		}
+
+		if (fm.cover) {
+			data.cover = this.extractCoverPath(String(fm.cover));
+		} else if (fm.coverUrl) {
+			data.cover = this.extractCoverPath(String(fm.coverUrl));
+		} else if (fm.coverLocalPath) {
+			data.cover = this.extractCoverPath(String(fm.coverLocalPath));
+		}
+
+		if (fm.isbn) data.isbn = String(fm.isbn);
+		if (fm.isbn13) data.isbn = String(fm.isbn13);
+		if (fm.asin) data.asin = String(fm.asin);
+		if (fm.url) data.url = String(fm.url);
+
+		return data;
+	}
+
 	/**
 	 * Parse YAML-like content from audiobook code block
 	 */
@@ -30,6 +200,13 @@ export class AudiobookCardRenderer {
 		for (const line of lines) {
 			const trimmed = line.trim();
 			if (!trimmed || trimmed.startsWith('#')) continue;
+
+			// Support bare wikilinks: [[Note Name]] without key prefix
+			const bareWikilink = trimmed.match(/^\[\[([^\]]+)\]\]$/);
+			if (bareWikilink && bareWikilink[1]) {
+				data.linkedFile = bareWikilink[1];
+				continue;
+			}
 
 			const colonIndex = trimmed.indexOf(':');
 			if (colonIndex === -1) continue;
@@ -45,6 +222,10 @@ export class AudiobookCardRenderer {
 
 			// Map to interface properties
 			switch (key.toLowerCase()) {
+				case 'file':
+					// Support wikilink [[Note]] and plain path
+					data.linkedFile = value.replace(/^\[\[(.+)\]\]$/, '$1');
+					break;
 				case 'title':
 					data.title = value;
 					break;
@@ -81,8 +262,25 @@ export class AudiobookCardRenderer {
 	/**
 	 * Render audiobook card in the markdown preview
 	 */
-	async render(el: HTMLElement, data: AudiobookCardData, ctx: MarkdownPostProcessorContext): Promise<void> {
+	async render(el: HTMLElement, codeBlockData: AudiobookCardData, ctx: MarkdownPostProcessorContext): Promise<void> {
 		el.empty();
+
+		// Determine base data source: linked file or current file's frontmatter
+		const { linkedFile, ...codeBlockOverrides } = codeBlockData;
+		const baseData = linkedFile
+			? this.extractFromLinkedFile(linkedFile)
+			: this.extractFromFrontmatter(ctx);
+
+		// Merge base data with code block overrides (code block always wins)
+		const data: AudiobookCardData = {
+			...baseData,
+			...codeBlockOverrides
+		};
+		
+		// If no data at all, don't render anything
+		if (!data.title && !data.author && !data.cover) {
+			return;
+		}
 
 		// Create card container
 		const card = el.createDiv({cls: 'audiobook-card'});

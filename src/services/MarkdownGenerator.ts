@@ -191,46 +191,12 @@ export class MarkdownGenerator {
 
 	/**
 	 * Generate audiobook code block for rendering
+	 * Since metadata is now in frontmatter, this creates a minimal trigger block
 	 */
 	private generateAudiobookCodeBlock(metadata: AudiobookMetadata): string {
 		const lines: string[] = ['```audiobook'];
-
-		lines.push(`title: "${this.escapeYaml(metadata.title)}"`);
-		if (metadata.author && metadata.author.length > 0) {
-			lines.push(`author: "${this.escapeYaml(metadata.author.join(', '))}"`);
-		}
-		if (metadata.narrator && metadata.narrator.length > 0) {
-			lines.push(`narrator: "${this.escapeYaml(metadata.narrator.join(', '))}"`);
-		}
-		if (metadata.duration) {
-			lines.push(`duration: "${metadata.duration}"`);
-		}
-		if (metadata.publisher) {
-			lines.push(`publisher: "${this.escapeYaml(metadata.publisher)}"`);
-		}
-		if (metadata.genre && metadata.genre.length > 0) {
-			lines.push(`genre: "${this.escapeYaml(metadata.genre.join(', '))}"`);
-		}
-		if (metadata.rating !== undefined) {
-			lines.push(`rating: ${metadata.rating}`);
-		}
-
-		// Cover
-		if (metadata.coverLocalPath) {
-			lines.push(`cover: "${metadata.coverLocalPath}"`);
-		} else if (metadata.coverUrl) {
-			lines.push(`cover: "${metadata.coverUrl}"`);
-		}
-
-		// Series
-		if (metadata.series) {
-			let seriesInfo = metadata.series;
-			if (metadata.seriesPosition) {
-				seriesInfo += ` - Book ${metadata.seriesPosition}`;
-			}
-			lines.push(`series: "${this.escapeYaml(seriesInfo)}"`);
-		}
-
+		lines.push('# Card renders from frontmatter');
+		lines.push('# You can override individual fields here if needed');
 		lines.push('```');
 		return lines.join('\n');
 	}

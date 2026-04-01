@@ -76,7 +76,40 @@ All commands are available via the Command Palette (Ctrl/Cmd + P):
 
 ### Audiobook Cards in Markdown
 
-Insert a visual audiobook card by creating an `audiobook` code block:
+The audiobook card automatically renders metadata from your file's **frontmatter**. Simply include an empty `audiobook` code block to trigger the card display:
+
+````markdown
+```audiobook
+# Card renders from frontmatter
+# You can override individual fields here if needed
+```
+````
+
+**The card automatically reads from frontmatter and displays:**
+- 📷 Cover image (from `cover`, `coverUrl`, or `coverLocalPath` field)
+- 📖 Title, subtitle, and author
+- 🎙️ Narrator
+- ⏱️ Duration
+- 📚 Publisher
+- 🌍 Language and publication date
+- ⭐ Star rating with numeric value
+- 🏷️ Genre tags (pill-style)
+- 📕 Series information with position
+
+#### Override Specific Fields
+
+You can override any frontmatter value by specifying it in the code block:
+
+````markdown
+```audiobook
+# Override just the rating
+rating: 5.0
+```
+````
+
+#### Legacy: Standalone Code Block
+
+For backwards compatibility or standalone cards without frontmatter, you can still provide all data in the code block:
 
 ````markdown
 ```audiobook
@@ -92,15 +125,15 @@ series: "Die Königsmörder-Chronik - Buch 1"
 ```
 ````
 
-**The card automatically renders with:**
-- 📷 Cover image (if available)
-- 📖 Title and author
-- 🎙️ Narrator
-- ⏱️ Duration
-- 📚 Publisher
-- ⭐ Star rating with numeric value
-- 🏷️ Genre tags (pill-style)
-- 📕 Series information (if applicable)
+**Supported fields in code block:**
+- `title`, `subtitle`, `author`, `narrator`
+- `duration`, `publisher`, `published`, `language`
+- `genre` (comma-separated or array)
+- `series`, `seriesPosition`
+- `rating` (0-5)
+- `cover` (local path or URL, supports wikilink format `[[image.jpg]]`)
+- `isbn`, `isbn13`, `asin`, `url`
+- `description`
 
 ### Example: Complete Audiobook
 
@@ -129,26 +162,28 @@ asin: "B08XYZ123"
 provider: "googlebooks"
 source_url: "https://books.google.com/books?id=..."
 retrieved_at: "2024-03-08T11:30:45.123Z"
+type: "book"
+subtype: "audiobook"
 ---
 
 # Der Name des Windes
 *Die Königsmörder-Chronik - Erster Tag*
 
 ```audiobook
-title: "Der Name des Windes"
-author: "Patrick Rothfuss"
-narrator: "Rufus Beck"
-duration: "27h 52m"
-publisher: "Knaur Hörverlag"
-genre: "Fantasy, Epos"
-rating: 4.5
-cover: "Audiobooks/_covers/Patrick_Rothfuss_-_Der_Name_des_Windes.jpg"
-series: "Die Königsmörder-Chronik - Buch 1"
+# Card renders from frontmatter
+# You can override individual fields here if needed
 ```
+
+## Description
+
+An epic fantasy novel...
 
 ## Notes
 
 <!-- Add your notes here -->
+```
+
+The audiobook card will automatically display all the metadata from the frontmatter!
 
 
 ### Workflow Examples
