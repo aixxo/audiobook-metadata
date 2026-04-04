@@ -348,9 +348,9 @@ export class AudiobookInputModal extends Modal {
 	/**
 	 * Fetch metadata by ID
 	 */
-	private async fetchById(id: string) {
+	private async fetchById(id: string, fallback?: AudiobookMetadata) {
 		try {
-			const metadata = await this.provider.fetchById(id);
+			const metadata = (await this.provider.fetchById(id)) ?? fallback ?? null;
 			if (metadata) {
 				this.onSubmit(metadata);
 				this.close();
@@ -397,7 +397,7 @@ export class AudiobookInputModal extends Modal {
 
 				const selectBtn = resultItem.createEl('button', {text: 'Select', cls: 'mod-cta'});
 				selectBtn.addEventListener('click', () => {
-					void this.fetchById(metadata.id);
+					void this.fetchById(metadata.id, metadata);
 				});
 			});
 		} catch (error) {

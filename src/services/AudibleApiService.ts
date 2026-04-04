@@ -11,6 +11,16 @@ interface AudibleSearchResponse {
 
 interface AudibleSearchProduct {
 	asin: string;
+	title?: string;
+	subtitle?: string;
+	authors?: AudiblePerson[];
+	narrators?: AudiblePerson[];
+	publisher_name?: string;
+	release_date?: string;
+	runtime_length_min?: number;
+	product_images?: { [key: string]: string };
+	series?: AudibleSeries[];
+	rating?: { overall_distribution?: { display_average_rating?: number; num_ratings?: number } };
 }
 
 interface AudiblePerson {
@@ -109,7 +119,8 @@ export class AudibleApiService implements IMetadataProvider {
 			const queryParams = new URLSearchParams({
 				num_results: '10',
 				products_sort_by: 'Relevance',
-				title: query
+				title: query,
+				response_groups: 'contributors,product_attrs,series,media,rating'
 			});
 
 			const tld = this.regionMap[this.country] || '.com';
@@ -130,11 +141,14 @@ export class AudibleApiService implements IMetadataProvider {
 				return [];
 			}
 
-			// Fetch full details for each result via Audnex
+			// Fetch full details for each result via Audnex.
+			// If Audnex doesn't know the title yet (pre-release), fall back to
+			// the catalog data returned directly by the search API.
 			const results: AudiobookSearchResult[] = [];
 			for (const product of searchResponse.products.slice(0, 10)) {
-				const metadata = await this.asinSearch(product.asin, this.country);
-				if (metadata) {
+				const metadata = (await this.asinSearch(product.asin, this.country))
+					?? this.mapCatalogProductToMetadata(product);
+				if (metadata.title) {
 					results.push({
 						metadata,
 						relevanceScore: undefined
@@ -147,6 +161,56 @@ export class AudibleApiService implements IMetadataProvider {
 			console.error('[Audible] Search error:', error);
 			return [];
 		}
+	}
+
+	/**
+	 * Map a catalog search product to AudiobookMetadata.
+	 * Used as fallback when Audnex does not yet have the title (pre-release).
+	 */
+	private mapCatalogProductToMetadata(product: AudibleSearchProduct): AudiobookMetadata {
+		const series: string[] = [];
+		let seriesPosition: string | undefined;
+		if (product.series && product.series.length > 0) {
+			const primary = product.series[0];
+			if (primary) {
+				series.push(primary.name);
+				if (primary.position) {
+					seriesPosition = this.cleanSeriesSequence(primary.name, primary.position);
+				}
+			}
+			const secondary = product.series[1];
+			if (secondary) {
+				series.push(secondary.name);
+			}
+		}
+
+		const duration = product.runtime_length_min
+			? this.formatDuration(Number(product.runtime_length_min))
+			: undefined;
+
+		const coverUrl = product.product_images
+			? (product.product_images['500'] ?? product.product_images['200'] ?? Object.values(product.product_images)[0])
+			: undefined;
+
+		return {
+			id: product.asin,
+			provider: 'audible',
+			title: product.title ?? '',
+			subtitle: product.subtitle,
+			author: product.authors ? product.authors.map((a: AudiblePerson) => a.name) : [],
+			narrator: product.narrators ? product.narrators.map((n: AudiblePerson) => n.name) : undefined,
+			publisher: product.publisher_name,
+			publishedDate: product.release_date,
+			duration,
+			series: series.length > 0 ? series.join(', ') : undefined,
+			seriesPosition,
+			rating: product.rating?.overall_distribution?.display_average_rating,
+			ratingCount: product.rating?.overall_distribution?.num_ratings,
+			coverUrl,
+			asin: product.asin,
+			retrievedAt: new Date().toISOString(),
+			url: this.buildAudibleUrl(product.asin, this.country)
+		};
 	}
 
 	/**
