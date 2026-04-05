@@ -448,3 +448,33 @@
 	font-size: 0.9rem;
 	margin-top: 0.25rem;
 }
+/* ============================================================
+   Series Card Styles
+   ============================================================ */
+
+/* Series status badge */
+.series-status-badge {
+	display: inline-block;
+	padding: 0.15rem 0.6rem;
+	border-radius: 12px;
+	font-size: 0.8rem;
+	font-weight: 500;
+	background-color: var(--background-modifier-border);
+	color: var(--text-muted);
+	margin-bottom: 0.25rem;
+}
+
+.series-status-running {
+	background-color: rgba(0, 180, 100, 0.15);
+	color: #00b464;
+}
+
+.var-color-green .series-status-running {
+	background-color: rgba(var(--color-green-rgb, 0, 180, 100), 0.15);
+	color: var(--color-green, #00b464);
+}
+
+.series-status-ended {
+	background-color: var(--background-modifier-border);
+	color: var(--text-muted);
+}

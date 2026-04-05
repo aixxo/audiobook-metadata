@@ -8,6 +8,11 @@ export type CoverStorage = "local" | "url";
 export type CustomFieldType = "string" | "number" | "boolean";
 export type CustomFieldsPosition = "start" | "end";
 
+// Series-specific types
+export type SeriesApiProvider = "tvmaze" | "tmdb";
+export type SeriesEpisodeDetailLevel = "none" | "seasons-only" | "full";
+export type SeriesFileMode = "single" | "per-season";
+
 /**
  * Interface for custom frontmatter fields
  */
@@ -16,6 +21,23 @@ export interface CustomFrontmatterField {
 	value: string;
 	type: CustomFieldType;
 	order: number;
+}
+
+export interface SeriesPluginSettings {
+	seriesOutputFolder: string;
+	seriesApiProvider: SeriesApiProvider;
+	tmdbApiKey: string;
+	tmdbLanguage: string;
+	seriesEpisodeDetailLevel: SeriesEpisodeDetailLevel;
+	seriesFileMode: SeriesFileMode;
+	seriesCoverStorage: CoverStorage;
+	seriesOfflineMode: boolean;
+	seriesRateLimitEnabled: boolean;
+	seriesRateLimitRequestsPerMinute: number;
+	seriesCacheEnabled: boolean;
+	seriesCacheDurationHours: number;
+	seriesCustomFrontmatterFields: CustomFrontmatterField[];
+	seriesCustomFieldsPosition: CustomFieldsPosition;
 }
 
 export interface AudiobookPluginSettings {
@@ -31,7 +53,25 @@ export interface AudiobookPluginSettings {
 	templateFormat: string;
 	customFrontmatterFields: CustomFrontmatterField[];
 	customFieldsPosition: CustomFieldsPosition;
+	series: SeriesPluginSettings;
 }
+
+export const DEFAULT_SERIES_SETTINGS: SeriesPluginSettings = {
+	seriesOutputFolder: 'Series',
+	seriesApiProvider: 'tvmaze',
+	tmdbApiKey: '',
+	tmdbLanguage: 'de-DE',
+	seriesEpisodeDetailLevel: 'full',
+	seriesFileMode: 'single',
+	seriesCoverStorage: 'local',
+	seriesOfflineMode: false,
+	seriesRateLimitEnabled: true,
+	seriesRateLimitRequestsPerMinute: 5,
+	seriesCacheEnabled: true,
+	seriesCacheDurationHours: 24,
+	seriesCustomFrontmatterFields: [],
+	seriesCustomFieldsPosition: 'end',
+};
 
 export const DEFAULT_SETTINGS: AudiobookPluginSettings = {
 	defaultOutputFolder: 'Audiobooks',
@@ -45,7 +85,8 @@ export const DEFAULT_SETTINGS: AudiobookPluginSettings = {
 	cacheDurationHours: 24,
 	templateFormat: '',
 	customFrontmatterFields: [],
-	customFieldsPosition: 'end'
+	customFieldsPosition: 'end',
+	series: DEFAULT_SERIES_SETTINGS,
 }
 
 export class AudiobookSettingTab extends PluginSettingTab {
@@ -232,7 +273,7 @@ export class AudiobookSettingTab extends PluginSettingTab {
 		this.plugin.settings.customFrontmatterFields
 			.sort((a, b) => a.order - b.order)
 			.forEach((field, index) => {
-				this.renderCustomFieldRow(tbody, field, index);
+				this.renderCustomFieldRow(tbody, this.plugin.settings.customFrontmatterFields, field, index);
 			});
 
 		// Add field button
@@ -267,9 +308,225 @@ export class AudiobookSettingTab extends PluginSettingTab {
 						modal.open();
 					}));
 		}
+
+		// ──────────────────────────────────────────────
+		// Series settings
+		// ──────────────────────────────────────────────
+		new Setting(containerEl).setName('TV series').setHeading();
+
+		const s = this.plugin.settings.series;
+
+		new Setting(containerEl)
+			.setName('Output folder')
+			.setDesc('Default folder for TV series metadata files')
+			.addText(text => text
+				.setPlaceholder('Series')
+				.setValue(s.seriesOutputFolder)
+				.onChange(async (value) => {
+					s.seriesOutputFolder = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('Offline mode')
+			.setDesc('Disable all API calls for series. Metadata must be entered manually.')
+			.addToggle(toggle => toggle
+				.setValue(s.seriesOfflineMode)
+				.onChange(async (value) => {
+					s.seriesOfflineMode = value;
+					await this.plugin.saveSettings();
+					this.display();
+				}));
+
+		if (!s.seriesOfflineMode) {
+			new Setting(containerEl).setName('Series API').setHeading();
+
+			new Setting(containerEl)
+				.setName('API provider')
+				.setDesc('Service used for fetching TV series metadata')
+				.addDropdown(dropdown => dropdown
+					.addOption('tvmaze', 'TVMaze (free, no key required)')
+					// eslint-disable-next-line obsidianmd/ui/sentence-case
+					.addOption('tmdb', 'TMDB – The Movie Database (API key required)')
+					.setValue(s.seriesApiProvider)
+					.onChange(async (value: SeriesApiProvider) => {
+						s.seriesApiProvider = value;
+						await this.plugin.saveSettings();
+						this.display();
+					}));
+
+			if (s.seriesApiProvider === 'tmdb') {
+				new Setting(containerEl)
+					.setName('TMDB API key')
+					.setDesc('Your API key from themoviedb.org')
+					.addText(text => text
+						.setPlaceholder('Enter TMDB API key')
+						.setValue(s.tmdbApiKey)
+						.onChange(async (value) => {
+							s.tmdbApiKey = value;
+							await this.plugin.saveSettings();
+						}));
+
+				new Setting(containerEl)
+					.setName('TMDB language')
+					.setDesc('Language for TMDB responses in BCP 47 format (e.g. de-DE, en-US, fr-FR). Falls back to English if translation is unavailable.')
+					.addText(text => text
+						.setPlaceholder('de-DE')
+						.setValue(s.tmdbLanguage)
+						.onChange(async (value) => {
+							s.tmdbLanguage = value.trim() || 'de-DE';
+							await this.plugin.saveSettings();
+						}));
+			}
+
+			new Setting(containerEl).setName('Series rate limiting').setHeading();
+
+			new Setting(containerEl)
+				.setName('Enable rate limiting')
+				.setDesc('Limit API requests for series lookups')
+				.addToggle(toggle => toggle
+					.setValue(s.seriesRateLimitEnabled)
+					.onChange(async (value) => {
+						s.seriesRateLimitEnabled = value;
+						await this.plugin.saveSettings();
+						this.display();
+					}));
+
+			if (s.seriesRateLimitEnabled) {
+				new Setting(containerEl)
+					.setName('Requests per minute')
+					.setDesc('Maximum number of API requests per minute (1-20)')
+					.addSlider(slider => slider
+						.setLimits(1, 20, 1)
+						.setValue(s.seriesRateLimitRequestsPerMinute)
+						.setDynamicTooltip()
+						.onChange(async (value) => {
+							s.seriesRateLimitRequestsPerMinute = value;
+							await this.plugin.saveSettings();
+						}));
+			}
+
+			new Setting(containerEl).setName('Series caching').setHeading();
+
+			new Setting(containerEl)
+				.setName('Enable caching')
+				.setDesc('Cache series metadata to reduce API calls')
+				.addToggle(toggle => toggle
+					.setValue(s.seriesCacheEnabled)
+					.onChange(async (value) => {
+						s.seriesCacheEnabled = value;
+						await this.plugin.saveSettings();
+						this.display();
+					}));
+
+			if (s.seriesCacheEnabled) {
+				new Setting(containerEl)
+					.setName('Cache duration (hours)')
+					.setDesc('How long to keep cached series metadata (1-168 hours)')
+					.addSlider(slider => slider
+						.setLimits(1, 168, 1)
+						.setValue(s.seriesCacheDurationHours)
+						.setDynamicTooltip()
+						.onChange(async (value) => {
+							s.seriesCacheDurationHours = value;
+							await this.plugin.saveSettings();
+						}));
+			}
+		}
+
+		new Setting(containerEl).setName('Series output').setHeading();
+
+		new Setting(containerEl)
+			.setName('Cover storage')
+			.setDesc('How to store series cover images')
+			.addDropdown(dropdown => dropdown
+				.addOption('local', 'Local (download and store in vault)')
+				.addOption('url', 'URL (reference external image URL)')
+				.setValue(s.seriesCoverStorage)
+				.onChange(async (value: CoverStorage) => {
+					s.seriesCoverStorage = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('File mode')
+			.setDesc('How many files to create per series')
+			.addDropdown(dropdown => dropdown
+				.addOption('single', 'Single file (all seasons in one file)')
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
+				.addOption('per-season', 'Per season (main file + one file per season)')
+				.setValue(s.seriesFileMode)
+				.onChange(async (value: SeriesFileMode) => {
+					s.seriesFileMode = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('Episode detail level')
+			.setDesc('How much episode information to include in the output')
+			.addDropdown(dropdown => dropdown
+				.addOption('full', 'Full (episode list per season)')
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
+				.addOption('seasons-only', 'Seasons only (no episode list)')
+				.addOption('none', 'None (no season/episode section)')
+				.setValue(s.seriesEpisodeDetailLevel)
+				.onChange(async (value: SeriesEpisodeDetailLevel) => {
+					s.seriesEpisodeDetailLevel = value;
+					await this.plugin.saveSettings();
+				}));
+
+		// Series custom frontmatter fields
+		new Setting(containerEl).setName('Series custom frontmatter fields').setHeading();
+
+		new Setting(containerEl)
+			.setName('Field position')
+			.setDesc('Where to place custom fields in the series frontmatter')
+			.addDropdown(dropdown => dropdown
+				.addOption('start', 'At the start')
+				.addOption('end', 'At the end')
+				.setValue(s.seriesCustomFieldsPosition)
+				.onChange(async (value: CustomFieldsPosition) => {
+					s.seriesCustomFieldsPosition = value;
+					await this.plugin.saveSettings();
+				}));
+
+		const seriesTableContainer = containerEl.createDiv({cls: 'custom-fields-table-container'});
+		const seriesTable = seriesTableContainer.createEl('table', {cls: 'custom-fields-table'});
+		const seriesThead = seriesTable.createEl('thead');
+		const seriesHeaderRow = seriesThead.createEl('tr');
+		seriesHeaderRow.createEl('th', {text: 'Key'});
+		seriesHeaderRow.createEl('th', {text: 'Value'});
+		seriesHeaderRow.createEl('th', {text: 'Type'});
+		seriesHeaderRow.createEl('th', {text: 'Actions'});
+
+		const seriesTbody = seriesTable.createEl('tbody');
+
+		s.seriesCustomFrontmatterFields
+			.sort((a, b) => a.order - b.order)
+			.forEach((field, index) => {
+				this.renderCustomFieldRow(seriesTbody, s.seriesCustomFrontmatterFields, field, index);
+			});
+
+		new Setting(containerEl)
+			.addButton(button => button
+				.setButtonText('Add custom field')
+				.setCta()
+				.onClick(async () => {
+					const maxOrder = s.seriesCustomFrontmatterFields.length > 0
+						? Math.max(...s.seriesCustomFrontmatterFields.map(f => f.order))
+						: -1;
+					s.seriesCustomFrontmatterFields.push({
+						key: '',
+						value: '',
+						type: 'string',
+						order: maxOrder + 1
+					});
+					await this.plugin.saveSettings();
+					this.display();
+				}));
 	}
 
-	private renderCustomFieldRow(tbody: HTMLTableSectionElement, field: CustomFrontmatterField, index: number): void {
+	private renderCustomFieldRow(tbody: HTMLTableSectionElement, fields: CustomFrontmatterField[], field: CustomFrontmatterField, index: number): void {
 		const row = tbody.createEl('tr');
 
 		// Key column
@@ -320,7 +577,6 @@ export class AudiobookSettingTab extends PluginSettingTab {
 		if (index > 0) {
 			const upButton = actionsCell.createEl('button', {text: '↑', title: 'Move up'});
 			upButton.addEventListener('click', () => void (async () => {
-				const fields = this.plugin.settings.customFrontmatterFields;
 				const prevField = fields.find(f => f.order === field.order - 1);
 				if (prevField) {
 					const tempOrder = field.order;
@@ -333,10 +589,9 @@ export class AudiobookSettingTab extends PluginSettingTab {
 		}
 
 		// Move down button
-		if (index < this.plugin.settings.customFrontmatterFields.length - 1) {
-			const downButton = actionsCell.createEl('button', {text: '↓', title: 'Move down'});
-			downButton.addEventListener('click', () => void (async () => {
-				const fields = this.plugin.settings.customFrontmatterFields;
+			if (index < fields.length - 1) {
+				const downButton = actionsCell.createEl('button', {text: '↓', title: 'Move down'});
+				downButton.addEventListener('click', () => void (async () => {
 				const nextField = fields.find(f => f.order === field.order + 1);
 				if (nextField) {
 					const tempOrder = field.order;
@@ -351,7 +606,6 @@ export class AudiobookSettingTab extends PluginSettingTab {
 		// Delete button
 		const deleteButton = actionsCell.createEl('button', {text: '✕', title: 'Delete', cls: 'custom-fields-delete'});
 		deleteButton.addEventListener('click', () => void (async () => {
-			const fields = this.plugin.settings.customFrontmatterFields;
 			const fieldIndex = fields.indexOf(field);
 			if (fieldIndex > -1) {
 				fields.splice(fieldIndex, 1);

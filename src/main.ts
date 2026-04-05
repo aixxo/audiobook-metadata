@@ -1,7 +1,9 @@
 import {Plugin, Notice} from 'obsidian';
-import {DEFAULT_SETTINGS, AudiobookPluginSettings, AudiobookSettingTab} from "./settings";
+import {DEFAULT_SETTINGS, DEFAULT_SERIES_SETTINGS, AudiobookPluginSettings, AudiobookSettingTab} from "./settings";
 import {AudiobookCardRenderer} from "./ui/AudiobookCardRenderer";
 import {AudiobookCommands} from "./commands/AudiobookCommands";
+import {SeriesCardRenderer} from "./ui/SeriesCardRenderer";
+import {SeriesCommands} from "./commands/SeriesCommands";
 import {CacheService, CacheData} from "./services/cache/CacheService";
 import {CacheCleanup} from "./services/cache/CacheCleanup";
 
@@ -9,6 +11,8 @@ export default class AudiobookMetadataPlugin extends Plugin {
 	settings: AudiobookPluginSettings;
 	private cardRenderer: AudiobookCardRenderer;
 	private commands: AudiobookCommands;
+	private seriesCardRenderer: SeriesCardRenderer;
+	private seriesCommands: SeriesCommands;
 	private cacheService: CacheService;
 	private cacheCleanup: CacheCleanup;
 
@@ -36,10 +40,19 @@ export default class AudiobookMetadataPlugin extends Plugin {
 		this.cardRenderer = new AudiobookCardRenderer(this.app);
 		this.commands = new AudiobookCommands(this.app, this.settings, this.cacheService);
 
+		this.seriesCardRenderer = new SeriesCardRenderer(this.app);
+		this.seriesCommands = new SeriesCommands(this.app, this.settings.series, this.cacheService);
+
 		// Register markdown code block processor
 		this.registerMarkdownCodeBlockProcessor('audiobook', async (source, el, ctx) => {
 			const data = this.cardRenderer.parseCodeBlock(source);
 			await this.cardRenderer.render(el, data, ctx);
+		});
+
+		// Register series code block processor
+		this.registerMarkdownCodeBlockProcessor('series', async (source, el, ctx) => {
+			const data = this.seriesCardRenderer.parseCodeBlock(source);
+			await this.seriesCardRenderer.render(el, data, ctx);
 		});
 
 		// Register commands
@@ -113,6 +126,49 @@ export default class AudiobookMetadataPlugin extends Plugin {
 			}
 		});
 
+		// Series commands
+		this.addCommand({
+			id: 'add-series-from-search',
+			name: 'Search and add series',
+			callback: async () => {
+				try {
+					await this.seriesCommands.addFromSearch();
+				} catch (error) {
+					console.error('Error in addFromSearch (series):', error);
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+					new Notice(`Failed to open series modal: ${errorMessage}`);
+				}
+			}
+		});
+
+		this.addCommand({
+			id: 'add-series-from-id',
+			name: 'Add series from identifier',
+			callback: async () => {
+				try {
+					await this.seriesCommands.addFromId();
+				} catch (error) {
+					console.error('Error in addFromId (series):', error);
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+					new Notice(`Failed to open series modal: ${errorMessage}`);
+				}
+			}
+		});
+
+		this.addCommand({
+			id: 'add-series-manually',
+			name: 'Add series manually',
+			callback: async () => {
+				try {
+					await this.seriesCommands.addManually();
+				} catch (error) {
+					console.error('Error in addManually (series):', error);
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+					new Notice(`Failed to open series modal: ${errorMessage}`);
+				}
+			}
+		});
+
 		// Add settings tab
 		this.addSettingTab(new AudiobookSettingTab(this.app, this));
 	}
@@ -122,7 +178,10 @@ export default class AudiobookMetadataPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<AudiobookPluginSettings>);
+		const saved = await this.loadData() as Partial<AudiobookPluginSettings> | null;
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
+		// Deep-merge series settings so new keys always have defaults
+		this.settings.series = Object.assign({}, DEFAULT_SERIES_SETTINGS, saved?.series);
 	}
 
 	async saveSettings() {
