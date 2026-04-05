@@ -292,9 +292,14 @@ export class AudiobookCardRenderer {
 			// Resolve local path to resource path
 			let coverSrc = data.cover;
 			if (!data.cover.startsWith('http://') && !data.cover.startsWith('https://')) {
-				// Local file - use Obsidian's resource path
+				// Local file - resolve via metadataCache so it works regardless of folder location
 				try {
-					coverSrc = this.app.vault.adapter.getResourcePath(data.cover);
+					const tFile = this.app.metadataCache.getFirstLinkpathDest(data.cover, ctx.sourcePath);
+					if (tFile) {
+						coverSrc = this.app.vault.getResourcePath(tFile);
+					} else {
+						coverSrc = this.app.vault.adapter.getResourcePath(data.cover);
+					}
 				} catch (error) {
 					console.error('Error resolving cover path:', error);
 				}

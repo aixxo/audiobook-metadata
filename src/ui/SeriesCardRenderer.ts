@@ -109,7 +109,12 @@ export class SeriesCardRenderer {
 
 			if (!coverSrc.startsWith('http://') && !coverSrc.startsWith('https://')) {
 				try {
-					coverSrc = this.app.vault.adapter.getResourcePath(coverSrc);
+					const tFile = this.app.metadataCache.getFirstLinkpathDest(coverSrc, ctx.sourcePath);
+					if (tFile) {
+						coverSrc = this.app.vault.getResourcePath(tFile);
+					} else {
+						coverSrc = this.app.vault.adapter.getResourcePath(coverSrc);
+					}
 				} catch (error) {
 					console.error('[SeriesCardRenderer] Error resolving cover path:', error);
 				}
