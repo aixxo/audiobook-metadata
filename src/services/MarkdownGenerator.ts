@@ -84,6 +84,11 @@ export class MarkdownGenerator {
 			lines.push(`duration: "${metadata.duration}"`);
 		}
 
+		// Overview/Description
+		if (metadata.description) {
+			lines.push(`overview: "${this.escapeYaml(metadata.description)}"`);
+		}
+
 		// Type/Subtype (for Obsidian Bases filtering)
 		lines.push('type: "book"');
 		lines.push('subtype: "audiobook"');
@@ -205,7 +210,7 @@ export class MarkdownGenerator {
 	 * Escape special characters for YAML
 	 */
 	private escapeYaml(str: string): string {
-		return str.replace(/"/g, '\\"').replace(/\n/g, ' ');
+		return str.replace(/"/g, '\\"').replace(/\n/g, '\\n');
 	}
 
 	/**
