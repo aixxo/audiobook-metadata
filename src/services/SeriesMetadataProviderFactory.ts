@@ -109,7 +109,7 @@ export class SeriesMetadataProviderFactory {
 
 				const result = await provider.fetchById(id);
 				if (result) {
-					await cache.set(providerId, cacheKey, result as unknown as import('../models/AudiobookMetadata').AudiobookMetadata);
+					await cache.set(providerId, cacheKey, result as unknown as import('../models/MediaMetadata').MediaMetadata);
 				}
 				return result;
 			}

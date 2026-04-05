@@ -1,5 +1,5 @@
 import {IMetadataProvider} from "./IMetadataProvider";
-import {AudiobookPluginSettings} from "../settings";
+import {MediaPluginSettings} from "../settings";
 import {RateLimiter} from "../utils/RateLimiter";
 import {CacheService} from "./cache/CacheService";
 import {GoogleBooksApiService} from "./GoogleBooksApiService";
@@ -12,11 +12,11 @@ import {ITunesApiService} from "./ITunesApiService";
  * Handles provider selection, rate limiting, and caching
  */
 export class MetadataProviderFactory {
-	private settings: AudiobookPluginSettings;
+	private settings: MediaPluginSettings;
 	private cacheService: CacheService | null;
 	private rateLimiters: Map<string, RateLimiter> = new Map();
 
-	constructor(settings: AudiobookPluginSettings, cacheService: CacheService | null) {
+	constructor(settings: MediaPluginSettings, cacheService: CacheService | null) {
 		this.settings = settings;
 		this.cacheService = cacheService;
 	}
@@ -136,7 +136,7 @@ export class MetadataProviderFactory {
 	/**
 	 * Update settings (e.g., when user changes settings)
 	 */
-	updateSettings(settings: AudiobookPluginSettings): void {
+	updateSettings(settings: MediaPluginSettings): void {
 		this.settings = settings;
 		
 		// Reset rate limiters if settings changed

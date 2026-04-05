@@ -1,6 +1,6 @@
-# Audiobook Metadata Plugin for Obsidian
+# Media Metadata Plugin for Obsidian
 
-An Obsidian Community Plugin for retrieving and managing audiobook metadata with support for multiple providers.
+An Obsidian Community Plugin for retrieving and managing media metadata with support for multiple providers.
 
 ## ⚠️ Disclaimer
 
@@ -16,8 +16,6 @@ An Obsidian Community Plugin for retrieving and managing audiobook metadata with
 ### 📚 Multi-Provider Support
 - **Audible** (fully implemented - DE, UK, US)
 - **Google Books API** (fully implemented)
-- **Open Library** (Placeholder, in development)
-- **iTunes/Apple Books** (Placeholder, in development)
 
 ### 🎯 Flexible Data Input
 - **URL Import**: Directly from provider URLs
@@ -27,8 +25,8 @@ An Obsidian Community Plugin for retrieving and managing audiobook metadata with
 
 ### 🎨 Markdown Integration
 - **YAML Frontmatter**: Structured metadata in frontmatter
-- **Audiobook Cards**: Visual representation with cover, rating, genres
-- **Custom Code Blocks**: Use `audiobook` code blocks for visual cards
+- **Media Cards**: Visual representation with cover, rating, genres
+- **Custom Code Blocks**: Use `media` code blocks for visual cards
 
 ### ⚡ Performance Features
 - **Rate Limiting**: Configurable (1-20 requests/minute, default: 5)
@@ -41,7 +39,7 @@ An Obsidian Community Plugin for retrieving and managing audiobook metadata with
 - **Automatic Organization**: Covers in `_covers/` subfolder
 
 ### 🛠️ Configurable
-- **Output Folder**: Selectable target folder (default: "Audiobooks")
+- **Output Folder**: Selectable target folder (default: "Media")
 - **Offline Mode**: Work without API access
 - **Provider Selection**: Switch between different data sources
 - **Audible Region**: Choose between DE, UK, US
@@ -50,14 +48,14 @@ An Obsidian Community Plugin for retrieving and managing audiobook metadata with
 
 ### Manual
 1. Download `main.js`, `manifest.json`, and `styles.css` from the latest release
-2. Create a folder: `<Vault>/.obsidian/plugins/audiobook-metadata/`
+2. Create a folder: `<Vault>/.obsidian/plugins/media-metadata/`
 3. Copy the three files into this folder
 4. Restart Obsidian or reload plugins
 5. Enable the plugin in **Settings → Community Plugins**
 
 ### From Community Store (planned)
 1. Open **Settings → Community Plugins → Browse**
-2. Search for "Audiobook Metadata"
+2. Search for "Media Metadata"
 3. Click **Install** and then **Enable**
 
 ## Usage
@@ -68,18 +66,18 @@ All commands are available via the Command Palette (Ctrl/Cmd + P):
 
 | Command | Description | Shortcut |
 |---------|-------------|----------|
-| **Add audiobook from URL** | Fetch metadata from a provider URL | - |
-| **Search and add audiobook** | Search for and add audiobooks | - |
-| **Add audiobook from ID (ASIN/ISBN)** | Import directly via ID | - |
-| **Refresh audiobook metadata** | Update metadata for current file | - |
-| **Clear audiobook metadata cache** | Manually clear cache | - |
+| **Add media from URL** | Fetch metadata from a provider URL | - |
+| **Search and add media** | Search for and add media items | - |
+| **Add media from ID (ASIN/ISBN)** | Import directly via ID | - |
+| **Refresh media metadata** | Update metadata for current file | - |
+| **Clear media metadata cache** | Manually clear cache | - |
 
-### Audiobook Cards in Markdown
+### Media Cards in Markdown
 
-The audiobook card automatically renders metadata from your file's **frontmatter**. Simply include an empty `audiobook` code block to trigger the card display:
+The media card automatically renders metadata from your file's **frontmatter**. Simply include an empty `media` code block to trigger the card display:
 
 ````markdown
-```audiobook
+```media
 # Card renders from frontmatter
 # You can override individual fields here if needed
 ```
@@ -101,7 +99,7 @@ The audiobook card automatically renders metadata from your file's **frontmatter
 You can override any frontmatter value by specifying it in the code block:
 
 ````markdown
-```audiobook
+```media
 # Override just the rating
 rating: 5.0
 ```
@@ -112,7 +110,7 @@ rating: 5.0
 For backwards compatibility or standalone cards without frontmatter, you can still provide all data in the code block:
 
 ````markdown
-```audiobook
+```media
 title: "Der Name des Windes"
 author: "Patrick Rothfuss"
 narrator: "Rufus Beck"
@@ -120,7 +118,7 @@ duration: "27h 52m"
 publisher: "Knaur Hörverlag"
 genre: "Fantasy, Epos"
 rating: 4.5
-cover: "Audiobooks/_covers/Patrick_Rothfuss_-_Der_Name_des_Windes.jpg"
+cover: "Media/_covers/Patrick_Rothfuss_-_Der_Name_des_Windes.jpg"
 series: "Die Königsmörder-Chronik - Buch 1"
 ```
 ````
@@ -135,11 +133,11 @@ series: "Die Königsmörder-Chronik - Buch 1"
 - `isbn`, `isbn13`, `asin`, `url`
 - `description`
 
-### Example: Complete Audiobook
+### Example: Complete Media Item
 
-After importing via command "Add audiobook from URL", the plugin automatically creates a file like:
+After importing via command "Add media from URL", the plugin automatically creates a file like:
 
-```markdown
+````markdown
 ---
 title: "Der Name des Windes"
 subtitle: "Die Königsmörder-Chronik - Erster Tag"
@@ -156,20 +154,20 @@ series: "Die Königsmörder-Chronik"
 series_position: "1"
 rating: 4.5
 rating_count: 12543
-cover: "Audiobooks/_covers/Patrick_Rothfuss_-_Der_Name_des_Windes.jpg"
+cover: "Media/_covers/Patrick_Rothfuss_-_Der_Name_des_Windes.jpg"
 isbn: "9783426522783"
 asin: "B08XYZ123"
 provider: "googlebooks"
 source_url: "https://books.google.com/books?id=..."
 retrieved_at: "2024-03-08T11:30:45.123Z"
 type: "book"
-subtype: "audiobook"
+subtype: "media"
 ---
 
 # Der Name des Windes
 *Die Königsmörder-Chronik - Erster Tag*
 
-```audiobook
+```media
 # Card renders from frontmatter
 # You can override individual fields here if needed
 ```
@@ -181,9 +179,9 @@ An epic fantasy novel...
 ## Notes
 
 <!-- Add your notes here -->
-```
+````
 
-The audiobook card will automatically display all the metadata from the frontmatter!
+The media card will automatically display all the metadata from the frontmatter!
 
 
 ### Workflow Examples
@@ -192,7 +190,7 @@ The audiobook card will automatically display all the metadata from the frontmat
 ```
 1. Copy the URL: https://books.google.com/books?id=abc123
 2. Open Command Palette (Cmd/Ctrl + P)
-3. Select "Add audiobook from URL"
+3. Select "Add media from URL"
 4. "URL" tab is already active
 5. Paste the URL → "Fetch Metadata"
 6. File is automatically created and opened
@@ -200,7 +198,7 @@ The audiobook card will automatically display all the metadata from the frontmat
 
 #### 2. Search by Title
 ```
-1. Command Palette → "Search and add audiobook"
+1. Command Palette → "Search and add media"
 2. Switch to "Search" tab
 3. Enter: "Harry Potter"
 4. Click "Search"
@@ -211,7 +209,7 @@ The audiobook card will automatically display all the metadata from the frontmat
 #### 3. Offline/Manual Entry
 ```
 1. Enable "Offline Mode" in Settings
-2. Command Palette → "Add audiobook from URL"
+2. Command Palette → "Add media from URL"
 3. "Manual" tab is automatically selected
 4. Fill in fields (title required)
 5. Click "Create"
@@ -222,14 +220,14 @@ The audiobook card will automatically display all the metadata from the frontmat
 ### General Settings
 
 **Default Output Folder**
-- Default: `Audiobooks`
-- Target folder for new audiobook files
+- Default: `Media`
+- Target folder for new media files
 
 ### API Provider
 
 **API Provider**
-- **Audible** (Default): Audiobook-specific with complete metadata (narrator, series, etc.)
-- **Google Books**: Ready to use, extensive library (but less audiobook data)
+- **Audible** (Default): Media-specific with complete metadata (narrator, series, etc.)
+- **Google Books**: Ready to use, extensive library (but less media data)
 - **Open Library**: Free library, in development  
 - **iTunes/Apple Books**: Apple ecosystem, in development
 
@@ -280,7 +278,7 @@ obsidian-book-metadata/
 │   ├── main.ts                           # Plugin Entry Point
 │   ├── settings.ts                       # Settings UI & Types
 │   ├── models/
-│   │   └── AudiobookMetadata.ts         # Central Data Models
+│   │   └── MediaMetadata.ts         # Central Data Models
 │   ├── services/
 │   │   ├── IMetadataProvider.ts         # Provider Interface
 │   │   ├── MetadataProviderFactory.ts   # Provider Management
@@ -295,10 +293,10 @@ obsidian-book-metadata/
 │   │       ├── CacheService.ts          # TTL Cache
 │   │       └── CacheCleanup.ts          # Auto-Cleanup
 │   ├── ui/
-│   │   ├── AudiobookCardRenderer.ts     # Code Block Renderer
-│   │   └── AudiobookInputModal.ts       # 4-Tab Modal
+│   │   ├── MediaCardRenderer.ts     # Code Block Renderer
+│   │   └── MediaInputModal.ts       # 4-Tab Modal
 │   ├── commands/
-│   │   └── AudiobookCommands.ts         # Command Handler
+│   │   └── MediaCommands.ts         # Command Handler
 │   └── utils/
 │       └── RateLimiter.ts               # Token-Bucket
 ├── styles.css                            # Plugin Styles
@@ -331,7 +329,7 @@ obsidian-book-metadata/
 ### Data Model
 
 ```typescript
-interface AudiobookMetadata {
+interface MediaMetadata {
   id: string;
   provider: string;
   
@@ -383,8 +381,8 @@ interface AudiobookMetadata {
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/obsidian-audiobook-metadata.git
-cd obsidian-audiobook-metadata
+git clone https://github.com/yourusername/obsidian-media-metadata.git
+cd obsidian-media-metadata
 
 # Install dependencies
 npm install
@@ -403,10 +401,10 @@ npm run lint
 
 ```bash
 # Option 1: Symlink (recommended for development)
-ln -s $(pwd) /path/to/vault/.obsidian/plugins/audiobook-metadata
+ln -s $(pwd) /path/to/vault/.obsidian/plugins/media-metadata
 
 # Option 2: Copy
-cp main.js manifest.json styles.css /path/to/vault/.obsidian/plugins/audiobook-metadata/
+cp main.js manifest.json styles.css /path/to/vault/.obsidian/plugins/media-metadata/
 ```
 
 After changes:
@@ -424,7 +422,7 @@ export class MyProviderApiService implements IMetadataProvider {
     return url.includes('myprovider.com');
   }
   
-  async fetchById(id: string): Promise<AudiobookMetadata | null> {
+  async fetchById(id: string): Promise<MediaMetadata | null> {
     // Implementation
   }
   
@@ -463,8 +461,8 @@ export type ApiProvider = "audible" | "googlebooks" | "openlibrary" | "itunes" |
 - Check file permissions in vault
 
 ### Cache issues
-- Clear cache manually: Command "Clear audiobook metadata cache"
-- Cache file: `.obsidian/plugins/audiobook-metadata/data.json`
+- Clear cache manually: Command "Clear media metadata cache"
+- Cache file: `.obsidian/plugins/media-metadata/data.json`
 - Reduce Cache Duration in Settings
 
 ## Known Limitations
@@ -476,7 +474,7 @@ export type ApiProvider = "audible" | "googlebooks" | "openlibrary" | "itunes" |
    - Only DE, UK, US regions available
 
 2. **Google Books API**
-   - Not all books have audiobook-specific data (narrator, duration)
+   - Not all books have media-specific data (narrator, duration)
    - Rate limits apply (hence rate limiter implemented)
    - Some regions have restricted access
 
@@ -500,8 +498,8 @@ Contributions are welcome!
 
 ### How to Contribute
 
-1. **Bug Reports**: [GitHub Issues](https://github.com/aixxo/audiobook-metadata/issues)
-2. **Feature Requests**: [GitHub Discussions](https://github.com/aixxo/audiobook-metadata/discussions)
+1. **Bug Reports**: [GitHub Issues](https://github.com/aixxo/media-metadata/issues)
+2. **Feature Requests**: [GitHub Discussions](https://github.com/aixxo/media-metadata/discussions)
 3. **Pull Requests**:
    ```bash
    git checkout -b feature/AmazingFeature
@@ -519,8 +517,8 @@ Contributions are welcome!
 
 ## Support & Community
 
-- **Issues**: [GitHub Issues](https://github.com/aixxo/audiobook-metadata/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/aixxo/audiobook-metadata/discussions)
+- **Issues**: [GitHub Issues](https://github.com/aixxo/media-metadata/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/aixxo/media-metadata/discussions)
 
 ## License
 
@@ -534,13 +532,22 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - **GitHub Copilot** for development support
 
 ## Changelog
+### v0.7.0 (2026-04-05) - Renamed to Media Metadata
+- 🔄 **Plugin renamed** from "Audiobook Metadata" to "Media Metadata"
+  - Plugin ID: `audiobook-metadata` → `media-metadata`
+  - All commands renamed: `add-audiobook-from-*` → `add-media-from-*`
+  - Code block tag: `media` (new primary), `audiobook` kept as backward-compatible alias
+  - CSS classes: `.audiobook-*` → `.media-*`
+  - Frontmatter `subtype`: `"audiobook"` → `"media"` (existing files with `"audiobook"` continue to work)
+  - Default output folder: `Audiobooks` → `Media` (only affects new installs)
+
 ### v0.3.0 (2026-03-08) - Support own frontmatter fields & batch update
 - ✨ **Custom frontmatter fields**
   - Define any key-value pairs in settings
-  - Automatically added to new audiobook files
+  - Automatically added to new media files
   - Supports string, number, boolean types
 - 🔄 **Batch update existing files**
-    - Apply new custom fields to existing audiobook files
+    - Apply new custom fields to existing media files
 
 ### v0.2.0 (2026-03-08) - Audible Integration
 - ✨ **Audible API fully implemented**
@@ -548,7 +555,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
   - URL import from Audible links
   - Text search via official Audible API
   - Multi-region support (DE, UK, US)
-- 🎙️ **Audiobook-specific metadata**
+- 🎙️ **Media-specific metadata**
   - Narrator information
   - Precise duration data
   - Series support (Primary & Secondary)
@@ -562,7 +569,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ### v0.1.0 (2026-03-08) - Initial Release
 - ✨ Multi-provider architecture
 - ✅ Google Books API fully implemented
-- 🎨 Visual audiobook cards via code blocks
+- 🎨 Visual media cards via code blocks
 - 📝 Automatic frontmatter generation
 - ⚡ Rate limiting & caching
 - 🖼️ Cover download with local storage
@@ -572,8 +579,3 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - 🔧 5 commands for different workflows
 
 ---
-
-**Version**: 0.3.0  
-**Status**: Beta  
-**Last Update**: March 8, 2024  
-**Compatibility**: Obsidian 0.15.0+

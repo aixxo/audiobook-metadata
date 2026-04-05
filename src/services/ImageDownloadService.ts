@@ -1,5 +1,5 @@
 import {App, requestUrl} from "obsidian";
-import {AudiobookPluginSettings} from "../settings";
+import {MediaPluginSettings} from "../settings";
 
 /**
  * Service for downloading and storing audiobook cover images
@@ -7,7 +7,7 @@ import {AudiobookPluginSettings} from "../settings";
 export class ImageDownloadService {
 	constructor(
 		private app: App,
-		private settings: AudiobookPluginSettings
+		private settings: MediaPluginSettings
 	) {}
 
 	/**
@@ -115,7 +115,7 @@ export class ImageDownloadService {
 	/**
 	 * Update settings reference
 	 */
-	updateSettings(settings: AudiobookPluginSettings) {
+	updateSettings(settings: MediaPluginSettings) {
 		this.settings = settings;
 	}
 }

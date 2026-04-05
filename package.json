@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-audiobook-metadata",
+	"name": "obsidian-media-metadata",
 	"version": "0.1.1",
-	"description": "Retrieve audiobook metadata from multiple providers and create formatted markdown files with media cards",
+	"description": "Retrieve media metadata from multiple providers and create formatted markdown files with media cards",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {

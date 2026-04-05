@@ -1,11 +1,11 @@
 import {App, Notice, TFile} from "obsidian";
-import {AudiobookMetadata} from "../models/AudiobookMetadata";
+import {MediaMetadata} from "../models/MediaMetadata";
 import {MarkdownGenerator} from "./MarkdownGenerator";
 import {ImageDownloadService} from "./ImageDownloadService";
-import {AudiobookPluginSettings} from "../settings";
+import {MediaPluginSettings} from "../settings";
 
 /**
- * Service for creating audiobook markdown files in the vault
+ * Service for creating media markdown files in the vault
  */
 export class FileCreator {
 	private markdownGenerator: MarkdownGenerator;
@@ -13,7 +13,7 @@ export class FileCreator {
 
 	constructor(
 		private app: App,
-		private settings: AudiobookPluginSettings
+		private settings: MediaPluginSettings
 	) {
 		this.markdownGenerator = new MarkdownGenerator(settings);
 		this.imageDownloadService = new ImageDownloadService(app, settings);
@@ -22,7 +22,7 @@ export class FileCreator {
 	/**
 	 * Create a new audiobook markdown file with metadata
 	 */
-	async createAudiobookFile(metadata: AudiobookMetadata): Promise<TFile | null> {
+	async createMediaFile(metadata: MediaMetadata): Promise<TFile | null> {
 		try {
 			// Generate filename
 			const filename = this.markdownGenerator.generateFilename(metadata);
@@ -59,24 +59,24 @@ export class FileCreator {
 			// Create file
 			const file = await this.app.vault.create(filepath, content);
 
-			new Notice(`Created audiobook file: ${filename}`);
+			new Notice(`Created media file: ${filename}`);
 
 			// Open the file
 			await this.app.workspace.getLeaf().openFile(file);
 
 			return file;
 		} catch (error) {
-			console.error('Error creating audiobook file:', error);
+			console.error('Error creating media file:', error);
 			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-			new Notice(`Failed to create audiobook file: ${errorMessage}`);
+			new Notice(`Failed to create media file: ${errorMessage}`);
 			return null;
 		}
 	}
 
 	/**
-	 * Update existing audiobook file with new metadata
+	 * Update existing media file with new metadata
 	 */
-	async updateAudiobookFile(file: TFile, metadata: AudiobookMetadata): Promise<boolean> {
+	async updateMediaFile(file: TFile, metadata: MediaMetadata): Promise<boolean> {
 		try {
 			// Download cover if enabled
 			if (this.settings.coverStorage === 'local' && metadata.coverUrl) {
@@ -96,13 +96,13 @@ export class FileCreator {
 			// Update file
 			await this.app.vault.modify(file, content);
 
-			new Notice(`Updated audiobook metadata: ${file.name}`);
+			new Notice(`Updated media metadata: ${file.name}`);
 
 			return true;
 		} catch (error) {
-			console.error('Error updating audiobook file:', error);
+			console.error('Error updating media file:', error);
 			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-			new Notice(`Failed to update audiobook file: ${errorMessage}`);
+			new Notice(`Failed to update media file: ${errorMessage}`);
 			return false;
 		}
 	}
@@ -127,7 +127,7 @@ export class FileCreator {
 	/**
 	 * Update settings reference
 	 */
-	updateSettings(settings: AudiobookPluginSettings) {
+	updateSettings(settings: MediaPluginSettings) {
 		this.settings = settings;
 		this.imageDownloadService.updateSettings(settings);
 	}

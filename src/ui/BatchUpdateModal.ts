@@ -1,6 +1,6 @@
 import {App, Modal, Notice, Setting, TFile} from "obsidian";
 import {BatchUpdateService, BatchUpdateResult} from "../services/BatchUpdateService";
-import {AudiobookPluginSettings, CustomFrontmatterField} from "../settings";
+import {MediaPluginSettings, CustomFrontmatterField} from "../settings";
 import {getSortedCustomFields} from "../utils/TypeGuards";
 
 /**
@@ -8,12 +8,12 @@ import {getSortedCustomFields} from "../utils/TypeGuards";
  */
 export class BatchUpdateModal extends Modal {
 	private batchService: BatchUpdateService;
-	private settings: AudiobookPluginSettings;
+	private settings: MediaPluginSettings;
 	private files: TFile[] = [];
 	private selectedFiles: Set<TFile> = new Set();
 	private isProcessing: boolean = false;
 
-	constructor(app: App, settings: AudiobookPluginSettings) {
+	constructor(app: App, settings: MediaPluginSettings) {
 		super(app);
 		this.settings = settings;
 		this.batchService = new BatchUpdateService(app, settings);
@@ -49,15 +49,15 @@ export class BatchUpdateModal extends Modal {
 		});
 
 		// Load files
-		contentEl.createEl('p', {text: 'Loading audiobook files...'});
+		contentEl.createEl('p', {text: 'Loading media files...'});
 		
 		try {
-			this.files = await this.batchService.getAudiobookFiles();
+			this.files = await this.batchService.getAllMediaFiles();
 			
 			if (this.files.length === 0) {
 				contentEl.empty();
 				contentEl.createEl('h2', {text: 'Batch update custom fields'});
-				contentEl.createEl('p', {text: 'No audiobook files found in vault.'});
+				contentEl.createEl('p', {text: 'No media files found in vault.'});
 				contentEl.createEl('p', {
 					text: 'Files must have "subtype: audiobook" in their frontmatter to be detected.',
 					cls: 'setting-item-description'

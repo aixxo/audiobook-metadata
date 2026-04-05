@@ -1,5 +1,5 @@
 import {IMetadataProvider} from "./IMetadataProvider";
-import {AudiobookMetadata, AudiobookSearchResult} from "../models/AudiobookMetadata";
+import {MediaMetadata, MediaSearchResult} from "../models/MediaMetadata";
 
 /**
  * Open Library API Provider (Placeholder)
@@ -17,17 +17,17 @@ export class OpenLibraryApiService implements IMetadataProvider {
 		return url.includes('openlibrary.org');
 	}
 
-	async fetchByUrl(url: string): Promise<AudiobookMetadata | null> {
+	async fetchByUrl(url: string): Promise<MediaMetadata | null> {
 		// TODO: Extract work/book ID and call fetchById
 		throw new Error('Open Library API is not yet implemented. Please use Google Books or switch to offline mode.');
 	}
 
-	async fetchById(id: string): Promise<AudiobookMetadata | null> {
+	async fetchById(id: string): Promise<MediaMetadata | null> {
 		// TODO: Implement Open Library API call
 		throw new Error('Open Library API is not yet implemented. Please use Google Books or switch to offline mode.');
 	}
 
-	async search(query: string): Promise<AudiobookSearchResult[]> {
+	async search(query: string): Promise<MediaSearchResult[]> {
 		// TODO: Implement Open Library search
 		throw new Error('Open Library API is not yet implemented. Please use Google Books or switch to offline mode.');
 	}

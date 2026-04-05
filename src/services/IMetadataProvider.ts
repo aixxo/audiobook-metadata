@@ -1,4 +1,4 @@
-import {AudiobookMetadata, AudiobookSearchResult} from "../models/AudiobookMetadata";
+import {MediaMetadata, MediaSearchResult} from "../models/MediaMetadata";
 
 /**
  * Base interface for metadata providers
@@ -10,21 +10,21 @@ export interface IMetadataProvider {
 	 * @param url Full URL to the audiobook
 	 * @returns Metadata or null if not found
 	 */
-	fetchByUrl(url: string): Promise<AudiobookMetadata | null>;
+	fetchByUrl(url: string): Promise<MediaMetadata | null>;
 	
 	/**
 	 * Fetch metadata by provider-specific ID (ASIN, ISBN, etc.)
 	 * @param id Provider-specific identifier
 	 * @returns Metadata or null if not found
 	 */
-	fetchById(id: string): Promise<AudiobookMetadata | null>;
+	fetchById(id: string): Promise<MediaMetadata | null>;
 	
 	/**
 	 * Search for audiobooks by query string
 	 * @param query Search terms (title, author, etc.)
 	 * @returns Array of search results
 	 */
-	search(query: string): Promise<AudiobookSearchResult[]>;
+	search(query: string): Promise<MediaSearchResult[]>;
 	
 	/**
 	 * Check if this provider supports a given URL

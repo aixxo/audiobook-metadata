@@ -1,5 +1,5 @@
 import {IMetadataProvider} from "./IMetadataProvider";
-import {AudiobookMetadata, AudiobookSearchResult} from "../models/AudiobookMetadata";
+import {MediaMetadata, MediaSearchResult} from "../models/MediaMetadata";
 import {requestUrl} from "obsidian";
 
 /**
@@ -57,7 +57,7 @@ export class GoogleBooksApiService implements IMetadataProvider {
 		return url.includes('books.google.') || url.includes('play.google.com/store/books');
 	}
 
-	async fetchByUrl(url: string): Promise<AudiobookMetadata | null> {
+	async fetchByUrl(url: string): Promise<MediaMetadata | null> {
 		// Extract book ID from Google Books URL
 		const idMatch = url.match(/id=([^&]+)/);
 		if (!idMatch || !idMatch[1]) {
@@ -68,7 +68,7 @@ export class GoogleBooksApiService implements IMetadataProvider {
 		return this.fetchById(idMatch[1]);
 	}
 
-	async fetchById(id: string): Promise<AudiobookMetadata | null> {
+	async fetchById(id: string): Promise<MediaMetadata | null> {
 		try {
 			const response = await requestUrl({
 				url: `${this.apiBaseUrl}/${id}`,
@@ -76,14 +76,14 @@ export class GoogleBooksApiService implements IMetadataProvider {
 			});
 
 			const data = response.json as GoogleBooksItem;
-			return this.mapToAudiobookMetadata(data);
+			return this.mapToMediaMetadata(data);
 		} catch (error) {
 			console.error('[GoogleBooks] Fetch error:', error);
 			return null;
 		}
 	}
 
-	async search(query: string): Promise<AudiobookSearchResult[]> {
+	async search(query: string): Promise<MediaSearchResult[]> {
 		try {
 			const encodedQuery = encodeURIComponent(query);
 			const response = await requestUrl({
@@ -98,7 +98,7 @@ export class GoogleBooksApiService implements IMetadataProvider {
 			}
 
 			return data.items.map((item: GoogleBooksItem) => ({
-				metadata: this.mapToAudiobookMetadata(item),
+				metadata: this.mapToMediaMetadata(item),
 				relevanceScore: undefined
 			}));
 		} catch (error) {
@@ -108,9 +108,9 @@ export class GoogleBooksApiService implements IMetadataProvider {
 	}
 
 	/**
-	 * Map Google Books API response to AudiobookMetadata
+	 * Map Google Books API response to MediaMetadata
 	 */
-	private mapToAudiobookMetadata(data: GoogleBooksItem): AudiobookMetadata {
+	private mapToMediaMetadata(data: GoogleBooksItem): MediaMetadata {
 		const volumeInfo = data.volumeInfo;
 		const saleInfo = data.saleInfo;
 

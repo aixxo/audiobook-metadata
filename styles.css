@@ -3,7 +3,7 @@
  */
 
 /* Main card container */
-.audiobook-card {
+.media-card {
 	display: flex;
 	gap: 1.5rem;
 	padding: 1.5rem;
@@ -15,16 +15,16 @@
 	transition: box-shadow 0.2s ease;
 }
 
-.audiobook-card:hover {
+.media-card:hover {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Cover image section */
-.audiobook-cover-section {
+.media-cover-section {
 	flex-shrink: 0;
 }
 
-.audiobook-cover {
+.media-cover {
 	width: 180px;
 	height: auto;
 	border-radius: 6px;
@@ -33,14 +33,14 @@
 }
 
 /* Info section */
-.audiobook-info {
+.media-info {
 	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
 }
 
-.audiobook-title {
+.media-title {
 	margin: 0 0 0.5rem 0;
 	font-size: 1.5rem;
 	font-weight: 600;
@@ -49,7 +49,7 @@
 }
 
 /* Metadata items */
-.audiobook-meta-item {
+.media-meta-item {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
@@ -57,44 +57,44 @@
 	color: var(--text-muted);
 }
 
-.audiobook-meta-icon {
+.media-meta-icon {
 	font-size: 1.1rem;
 	flex-shrink: 0;
 }
 
-.audiobook-meta-text {
+.media-meta-text {
 	line-height: 1.4;
 }
 
 /* Rating section */
-.audiobook-rating {
+.media-rating {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
 	font-size: 1rem;
 }
 
-.audiobook-stars {
+.media-stars {
 	color: var(--text-accent);
 	font-size: 1.2rem;
 	letter-spacing: 2px;
 }
 
-.audiobook-rating-value {
+.media-rating-value {
 	font-size: 0.9rem;
 	color: var(--text-muted);
 	font-weight: 500;
 }
 
 /* Genre tags */
-.audiobook-genre-container {
+.media-genre-container {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.5rem;
 	margin-top: 0.5rem;
 }
 
-.audiobook-genre-tag {
+.media-genre-tag {
 	display: inline-block;
 	padding: 0.25rem 0.75rem;
 	background-color: var(--background-primary-alt);
@@ -106,7 +106,7 @@
 }
 
 /* Series info */
-.audiobook-series {
+.media-series {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
@@ -117,7 +117,7 @@
 	border-radius: 4px;
 }
 
-.audiobook-series-text {
+.media-series-text {
 	font-style: italic;
 	color: var(--text-normal);
 	font-size: 0.9rem;
@@ -125,38 +125,38 @@
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-	.audiobook-card {
+	.media-card {
 		flex-direction: column;
 		align-items: center;
 		text-align: center;
 	}
 
-	.audiobook-cover {
+	.media-cover {
 		width: 150px;
 	}
 
-	.audiobook-info {
+	.media-info {
 		align-items: center;
 	}
 
-	.audiobook-meta-item {
+	.media-meta-item {
 		justify-content: center;
 	}
 
-	.audiobook-genre-container {
+	.media-genre-container {
 		justify-content: center;
 	}
 }
 
 /* Input Modal Styles */
-.audiobook-tabs {
+.media-tabs {
 	display: flex;
 	gap: 0.5rem;
 	margin-bottom: 1.5rem;
 	border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.audiobook-tab {
+.media-tab {
 	padding: 0.75rem 1rem;
 	cursor: pointer;
 	border-bottom: 2px solid transparent;
@@ -165,35 +165,35 @@
 	font-weight: 500;
 }
 
-.audiobook-tab:hover {
+.media-tab:hover {
 	color: var(--text-normal);
 	background-color: var(--background-secondary);
 }
 
-.audiobook-tab-active {
+.media-tab-active {
 	color: var(--text-accent);
 	border-bottom-color: var(--text-accent);
 }
 
-.audiobook-tab-disabled {
+.media-tab-disabled {
 	opacity: 0.4;
 	cursor: not-allowed;
 }
 
-.audiobook-tab-disabled:hover {
+.media-tab-disabled:hover {
 	background-color: transparent;
 }
 
-.audiobook-input-content {
+.media-input-content {
 	padding: 1rem 0;
 }
 
-.audiobook-tab-content {
+.media-tab-content {
 	min-height: 200px;
 }
 
 /* Search results */
-.audiobook-search-results {
+.media-search-results {
 	margin-top: 1.5rem;
 	max-height: 400px;
 	overflow-y: auto;
@@ -411,13 +411,13 @@
 	font-weight: 500;
 }
 
-.audiobook-search-empty {
+.media-search-empty {
 	padding: 2rem;
 	text-align: center;
 	color: var(--text-muted);
 }
 
-.audiobook-search-item {
+.media-search-item {
 	display: flex;
 	gap: 1rem;
 	padding: 1rem;
@@ -428,22 +428,22 @@
 	align-items: center;
 }
 
-.audiobook-search-item:hover {
+.media-search-item:hover {
 	background-color: var(--background-secondary-alt);
 }
 
-.audiobook-search-thumbnail {
+.media-search-thumbnail {
 	width: 60px;
 	height: auto;
 	border-radius: 4px;
 	flex-shrink: 0;
 }
 
-.audiobook-search-info {
+.media-search-info {
 	flex-grow: 1;
 }
 
-.audiobook-search-author {
+.media-search-author {
 	color: var(--text-muted);
 	font-size: 0.9rem;
 	margin-top: 0.25rem;

@@ -1,5 +1,5 @@
 import {IMetadataProvider} from "./IMetadataProvider";
-import {AudiobookMetadata, AudiobookSearchResult} from "../models/AudiobookMetadata";
+import {MediaMetadata, MediaSearchResult} from "../models/MediaMetadata";
 import {requestUrl} from "obsidian";
 
 /**
@@ -86,7 +86,7 @@ export class AudibleApiService implements IMetadataProvider {
 		       url.includes('audible.com');
 	}
 
-	async fetchByUrl(url: string): Promise<AudiobookMetadata | null> {
+	async fetchByUrl(url: string): Promise<MediaMetadata | null> {
 		// Extract ASIN from URL
 		// Format: https://www.audible.de/pd/{title}/B08XYZ123
 		const asinMatch = url.match(/\/([A-Z0-9]{10})(?:\/|\?|$)/);
@@ -98,11 +98,11 @@ export class AudibleApiService implements IMetadataProvider {
 		return this.fetchById(asinMatch[1]);
 	}
 
-	async fetchById(id: string): Promise<AudiobookMetadata | null> {
+	async fetchById(id: string): Promise<MediaMetadata | null> {
 		return this.asinSearch(id, this.country);
 	}
 
-	async search(query: string): Promise<AudiobookSearchResult[]> {
+	async search(query: string): Promise<MediaSearchResult[]> {
 		try {
 			// First try ASIN search if query looks like ASIN
 			if (this.isValidASIN(query.toUpperCase())) {
@@ -144,7 +144,7 @@ export class AudibleApiService implements IMetadataProvider {
 			// Fetch full details for each result via Audnex.
 			// If Audnex doesn't know the title yet (pre-release), fall back to
 			// the catalog data returned directly by the search API.
-			const results: AudiobookSearchResult[] = [];
+			const results: MediaSearchResult[] = [];
 			for (const product of searchResponse.products.slice(0, 10)) {
 				const metadata = (await this.asinSearch(product.asin, this.country))
 					?? this.mapCatalogProductToMetadata(product);
@@ -164,10 +164,10 @@ export class AudibleApiService implements IMetadataProvider {
 	}
 
 	/**
-	 * Map a catalog search product to AudiobookMetadata.
+	 * Map a catalog search product to MediaMetadata.
 	 * Used as fallback when Audnex does not yet have the title (pre-release).
 	 */
-	private mapCatalogProductToMetadata(product: AudibleSearchProduct): AudiobookMetadata {
+	private mapCatalogProductToMetadata(product: AudibleSearchProduct): MediaMetadata {
 		const series: string[] = [];
 		let seriesPosition: string | undefined;
 		if (product.series && product.series.length > 0) {
@@ -216,7 +216,7 @@ export class AudibleApiService implements IMetadataProvider {
 	/**
 	 * Search by ASIN using Audnex API
 	 */
-	private async asinSearch(asin: string, region: string): Promise<AudiobookMetadata | null> {
+	private async asinSearch(asin: string, region: string): Promise<MediaMetadata | null> {
 		try {
 			if (!asin) return null;
 
@@ -238,7 +238,7 @@ export class AudibleApiService implements IMetadataProvider {
 				return null;
 			}
 
-			return this.mapToAudiobookMetadata(bookDetail);
+			return this.mapToMediaMetadata(bookDetail);
 		} catch (error) {
 			console.error('[Audible] ASIN search error:', error);
 			return null;
@@ -246,9 +246,9 @@ export class AudibleApiService implements IMetadataProvider {
 	}
 
 	/**
-	 * Map Audible API response to AudiobookMetadata
+	 * Map Audible API response to MediaMetadata
 	 */
-	private mapToAudiobookMetadata(data: AudibleBookDetail): AudiobookMetadata {
+	private mapToMediaMetadata(data: AudibleBookDetail): MediaMetadata {
 		const series: string[] = [];
 		let seriesPosition: string | undefined;
 

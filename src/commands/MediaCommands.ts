@@ -1,20 +1,20 @@
 import {App, Notice} from "obsidian";
-import {AudiobookPluginSettings} from "../settings";
+import {MediaPluginSettings} from "../settings";
 import {MetadataProviderFactory} from "../services/MetadataProviderFactory";
 import {FileCreator} from "../services/FileCreator";
-import {AudiobookInputModal} from "../ui/AudiobookInputModal";
+import {MediaInputModal} from "../ui/MediaInputModal";
 import {CacheService} from "../services/cache/CacheService";
 
 /**
- * Handler for audiobook-related commands
+ * Handler for media-related commands
  */
-export class AudiobookCommands {
+export class MediaCommands {
 	private providerFactory: MetadataProviderFactory;
 	private fileCreator: FileCreator;
 
 	constructor(
 		private app: App,
-		private settings: AudiobookPluginSettings,
+		private settings: MediaPluginSettings,
 		private cacheService: CacheService
 	) {
 		this.providerFactory = new MetadataProviderFactory(settings, cacheService);
@@ -28,13 +28,13 @@ export class AudiobookCommands {
 		// Open modal with URL tab
 		const provider = this.providerFactory.getProvider();
 		
-		const modal = new AudiobookInputModal(
+		const modal = new MediaInputModal(
 			this.app,
 			provider,
 			this.settings.offlineMode,
 			(metadata) => {
 				if (metadata) {
-					void this.fileCreator.createAudiobookFile(metadata);
+					void this.fileCreator.createMediaFile(metadata);
 				}
 			},
 			'url'
@@ -54,13 +54,13 @@ export class AudiobookCommands {
 
 		const provider = this.providerFactory.getProvider();
 		
-		const modal = new AudiobookInputModal(
+		const modal = new MediaInputModal(
 			this.app,
 			provider,
 			this.settings.offlineMode,
 			(metadata) => {
 				if (metadata) {
-					void this.fileCreator.createAudiobookFile(metadata);
+					void this.fileCreator.createMediaFile(metadata);
 				}
 			},
 			'search'
@@ -80,13 +80,13 @@ export class AudiobookCommands {
 
 		const provider = this.providerFactory.getProvider();
 		
-		const modal = new AudiobookInputModal(
+		const modal = new MediaInputModal(
 			this.app,
 			provider,
 			this.settings.offlineMode,
 			(metadata) => {
 				if (metadata) {
-					void this.fileCreator.createAudiobookFile(metadata);
+					void this.fileCreator.createMediaFile(metadata);
 				}
 			},
 			'id'
@@ -135,7 +135,7 @@ export class AudiobookCommands {
 			}
 
 			if (metadata) {
-				await this.fileCreator.updateAudiobookFile(activeFile, metadata);
+				await this.fileCreator.updateMediaFile(activeFile, metadata);
 			} else {
 				new Notice('Could not refresh metadata - no source information found');
 			}
@@ -176,7 +176,7 @@ export class AudiobookCommands {
 	/**
 	 * Update settings and refresh dependencies
 	 */
-	updateSettings(settings: AudiobookPluginSettings) {
+	updateSettings(settings: MediaPluginSettings) {
 		this.settings = settings;
 		this.providerFactory.updateSettings(settings);
 		this.fileCreator.updateSettings(settings);

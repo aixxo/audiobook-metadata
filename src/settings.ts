@@ -1,5 +1,5 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
-import AudiobookMetadataPlugin from "./main";
+import MediaMetadataPlugin from "./main";
 import {BatchUpdateModal} from "./ui/BatchUpdateModal";
 
 export type ApiProvider = "audible" | "googlebooks" | "openlibrary" | "itunes";
@@ -40,7 +40,7 @@ export interface SeriesPluginSettings {
 	seriesCustomFieldsPosition: CustomFieldsPosition;
 }
 
-export interface AudiobookPluginSettings {
+export interface MediaPluginSettings {
 	defaultOutputFolder: string;
 	apiProvider: ApiProvider;
 	audibleCountry: AudibleCountry;
@@ -73,8 +73,8 @@ export const DEFAULT_SERIES_SETTINGS: SeriesPluginSettings = {
 	seriesCustomFieldsPosition: 'end',
 };
 
-export const DEFAULT_SETTINGS: AudiobookPluginSettings = {
-	defaultOutputFolder: 'Audiobooks',
+export const DEFAULT_SETTINGS: MediaPluginSettings = {
+	defaultOutputFolder: 'Media',
 	apiProvider: 'audible',
 	audibleCountry: 'de',
 	offlineMode: false,
@@ -89,10 +89,10 @@ export const DEFAULT_SETTINGS: AudiobookPluginSettings = {
 	series: DEFAULT_SERIES_SETTINGS,
 }
 
-export class AudiobookSettingTab extends PluginSettingTab {
-	plugin: AudiobookMetadataPlugin;
+export class MediaSettingTab extends PluginSettingTab {
+	plugin: MediaMetadataPlugin;
 
-	constructor(app: App, plugin: AudiobookMetadataPlugin) {
+	constructor(app: App, plugin: MediaMetadataPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -107,9 +107,9 @@ export class AudiobookSettingTab extends PluginSettingTab {
 		// Output Folder
 		new Setting(containerEl)
 			.setName('Output folder')
-			.setDesc('Default folder for audiobook metadata files')
+			.setDesc('Default folder for media metadata files')
 			.addText(text => text
-				.setPlaceholder('Audiobooks')
+				.setPlaceholder('Media')
 				.setValue(this.plugin.settings.defaultOutputFolder)
 				.onChange(async (value) => {
 					this.plugin.settings.defaultOutputFolder = value;
@@ -300,7 +300,7 @@ export class AudiobookSettingTab extends PluginSettingTab {
 		if (this.plugin.settings.customFrontmatterFields.length > 0) {
 			new Setting(containerEl)
 				.setName('Batch update')
-				.setDesc('Apply custom fields to existing audiobook files')
+				.setDesc('Apply custom fields to existing media files')
 				.addButton(button => button
 					.setButtonText('Apply to existing files')
 					.onClick(() => {

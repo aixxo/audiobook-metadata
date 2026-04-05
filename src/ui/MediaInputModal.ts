@@ -1,11 +1,11 @@
 import {App, Modal, Notice, Setting} from "obsidian";
-import {AudiobookMetadata} from "../models/AudiobookMetadata";
+import {MediaMetadata} from "../models/MediaMetadata";
 import {IMetadataProvider} from "../services/IMetadataProvider";
 
 /**
- * Modal for audiobook input with multiple tabs
+ * Modal for media input with multiple tabs
  */
-export class AudiobookInputModal extends Modal {
+export class MediaInputModal extends Modal {
 	private activeTab: 'url' | 'search' | 'id' | 'manual' = 'url';
 	private initialTab: 'url' | 'search' | 'id' | 'manual';
 	private tabContentContainer: HTMLElement;
@@ -23,13 +23,13 @@ export class AudiobookInputModal extends Modal {
 	private manualTabEl: HTMLElement;
 
 	// Callback
-	private onSubmit: (metadata: AudiobookMetadata | null) => void;
+	private onSubmit: (metadata: MediaMetadata | null) => void;
 
 	constructor(
 		app: App,
 		private provider: IMetadataProvider,
 		private offlineMode: boolean,
-		onSubmit: (metadata: AudiobookMetadata | null) => void,
+		onSubmit: (metadata: MediaMetadata | null) => void,
 		initialTab: 'url' | 'search' | 'id' | 'manual' = 'url'
 	) {
 		super(app);
@@ -241,7 +241,7 @@ export class AudiobookInputModal extends Modal {
 	 * Build manual entry tab
 	 */
 	private buildManualTab() {
-		const metadata: Partial<AudiobookMetadata> = {
+		const metadata: Partial<MediaMetadata> = {
 			provider: 'manual'
 		};
 
@@ -251,7 +251,7 @@ export class AudiobookInputModal extends Modal {
 				new Notice('Title is required');
 				return;
 			}
-			this.onSubmit(metadata as AudiobookMetadata);
+			this.onSubmit(metadata as MediaMetadata);
 			this.close();
 		};
 
@@ -348,7 +348,7 @@ export class AudiobookInputModal extends Modal {
 	/**
 	 * Fetch metadata by ID
 	 */
-	private async fetchById(id: string, fallback?: AudiobookMetadata) {
+	private async fetchById(id: string, fallback?: MediaMetadata) {
 		try {
 			const metadata = (await this.provider.fetchById(id)) ?? fallback ?? null;
 			if (metadata) {

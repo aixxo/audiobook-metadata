@@ -1,9 +1,9 @@
 import {App, MarkdownPostProcessorContext, TFile} from "obsidian";
 
 /**
- * Interface for audiobook card data parsed from code block
+ * Interface for media card data parsed from code block
  */
-export interface AudiobookCardData {
+export interface MediaCardData {
 	title?: string;
 	author?: string;
 	narrator?: string;
@@ -25,9 +25,9 @@ export interface AudiobookCardData {
 }
 
 /**
- * Renderer for audiobook media cards in markdown
+ * Renderer for media cards in markdown
  */
-export class AudiobookCardRenderer {
+export class MediaCardRenderer {
 	constructor(private app: App) {}
 	
 	/**
@@ -48,8 +48,8 @@ export class AudiobookCardRenderer {
 	/**
 	 * Extract audiobook data from file frontmatter
 	 */
-	private extractFromFrontmatter(ctx: MarkdownPostProcessorContext): AudiobookCardData {
-		const data: AudiobookCardData = {};
+	private extractFromFrontmatter(ctx: MarkdownPostProcessorContext): MediaCardData {
+		const data: MediaCardData = {};
 		
 		// Get the file from the context
 		const file = this.app.vault.getAbstractFileByPath(ctx.sourcePath);
@@ -65,7 +65,7 @@ export class AudiobookCardRenderer {
 		
 		const fm = cache.frontmatter;
 		
-		// Map frontmatter fields to AudiobookCardData
+		// Map frontmatter fields to MediaCardData
 		if (fm.title) data.title = String(fm.title);
 		if (fm.subtitle) data.subtitle = String(fm.subtitle);
 		
@@ -132,8 +132,8 @@ export class AudiobookCardRenderer {
 	/**
 	 * Extract audiobook data from a linked note's frontmatter
 	 */
-	private extractFromLinkedFile(linkPath: string): AudiobookCardData {
-		const data: AudiobookCardData = {};
+	private extractFromLinkedFile(linkPath: string): MediaCardData {
+		const data: MediaCardData = {};
 
 		const file = this.app.metadataCache.getFirstLinkpathDest(linkPath, '');
 		if (!file || !(file instanceof TFile)) {
@@ -193,8 +193,8 @@ export class AudiobookCardRenderer {
 	/**
 	 * Parse YAML-like content from audiobook code block
 	 */
-	parseCodeBlock(source: string): AudiobookCardData {
-		const data: AudiobookCardData = {};
+	parseCodeBlock(source: string): MediaCardData {
+		const data: MediaCardData = {};
 		const lines = source.split('\n');
 
 		for (const line of lines) {
@@ -262,7 +262,7 @@ export class AudiobookCardRenderer {
 	/**
 	 * Render audiobook card in the markdown preview
 	 */
-	async render(el: HTMLElement, codeBlockData: AudiobookCardData, ctx: MarkdownPostProcessorContext): Promise<void> {
+	async render(el: HTMLElement, codeBlockData: MediaCardData, ctx: MarkdownPostProcessorContext): Promise<void> {
 		el.empty();
 
 		// Determine base data source: linked file or current file's frontmatter
@@ -272,7 +272,7 @@ export class AudiobookCardRenderer {
 			: this.extractFromFrontmatter(ctx);
 
 		// Merge base data with code block overrides (code block always wins)
-		const data: AudiobookCardData = {
+		const data: MediaCardData = {
 			...baseData,
 			...codeBlockOverrides
 		};
@@ -283,11 +283,11 @@ export class AudiobookCardRenderer {
 		}
 
 		// Create card container
-		const card = el.createDiv({cls: 'audiobook-card'});
+		const card = el.createDiv({cls: 'media-card'});
 
 		// Cover section
 		if (data.cover) {
-			const coverSection = card.createDiv({cls: 'audiobook-cover-section'});
+			const coverSection = card.createDiv({cls: 'media-cover-section'});
 			
 			// Resolve local path to resource path
 			let coverSrc = data.cover;
@@ -301,7 +301,7 @@ export class AudiobookCardRenderer {
 			}
 			
 		coverSection.createEl('img', {
-			cls: 'audiobook-cover',
+			cls: 'media-cover',
 			attr: {
 				src: coverSrc,
 				alt: data.title || 'Audiobook cover'
@@ -310,62 +310,62 @@ export class AudiobookCardRenderer {
 	}
 
 	// Info section
-	const infoSection = card.createDiv({cls: 'audiobook-info'});
+	const infoSection = card.createDiv({cls: 'media-info'});
 
 	// Title
 	if (data.title) {
 		infoSection.createEl('h3', {
-			cls: 'audiobook-title',
+			cls: 'media-title',
 			text: data.title
 		});
 	}
 
 	// Author
 	if (data.author) {
-		const authorDiv = infoSection.createDiv({cls: 'audiobook-meta-item'});
-		authorDiv.createSpan({cls: 'audiobook-meta-icon', text: '✍️'});
-		authorDiv.createSpan({cls: 'audiobook-meta-text', text: data.author});
+		const authorDiv = infoSection.createDiv({cls: 'media-meta-item'});
+		authorDiv.createSpan({cls: 'media-meta-icon', text: '✍️'});
+		authorDiv.createSpan({cls: 'media-meta-text', text: data.author});
 	}
 
 	// Narrator
 		if (data.narrator) {
-			const narratorDiv = infoSection.createDiv({cls: 'audiobook-meta-item'});
-			narratorDiv.createSpan({cls: 'audiobook-meta-icon', text: '🎙️'});
-			narratorDiv.createSpan({cls: 'audiobook-meta-text', text: data.narrator});
+			const narratorDiv = infoSection.createDiv({cls: 'media-meta-item'});
+			narratorDiv.createSpan({cls: 'media-meta-icon', text: '🎙️'});
+			narratorDiv.createSpan({cls: 'media-meta-text', text: data.narrator});
 		}
 
 		// Duration
 		if (data.duration) {
-			const durationDiv = infoSection.createDiv({cls: 'audiobook-meta-item'});
-			durationDiv.createSpan({cls: 'audiobook-meta-icon', text: '⏱️'});
-			durationDiv.createSpan({cls: 'audiobook-meta-text', text: data.duration});
+			const durationDiv = infoSection.createDiv({cls: 'media-meta-item'});
+			durationDiv.createSpan({cls: 'media-meta-icon', text: '⏱️'});
+			durationDiv.createSpan({cls: 'media-meta-text', text: data.duration});
 		}
 
 		// Publisher
 		if (data.publisher) {
-			const publisherDiv = infoSection.createDiv({cls: 'audiobook-meta-item'});
-			publisherDiv.createSpan({cls: 'audiobook-meta-icon', text: '📚'});
-			publisherDiv.createSpan({cls: 'audiobook-meta-text', text: data.publisher});
+			const publisherDiv = infoSection.createDiv({cls: 'media-meta-item'});
+			publisherDiv.createSpan({cls: 'media-meta-icon', text: '📚'});
+			publisherDiv.createSpan({cls: 'media-meta-text', text: data.publisher});
 		}
 
 		// Rating
 		if (data.rating !== undefined) {
-			const ratingDiv = infoSection.createDiv({cls: 'audiobook-rating'});
+			const ratingDiv = infoSection.createDiv({cls: 'media-rating'});
 			const stars = this.renderStars(data.rating);
-			ratingDiv.createSpan({cls: 'audiobook-stars', text: stars});
+			ratingDiv.createSpan({cls: 'media-stars', text: stars});
 			ratingDiv.createSpan({
-				cls: 'audiobook-rating-value',
+				cls: 'media-rating-value',
 				text: ` ${data.rating.toFixed(1)}`
 			});
 		}
 
 		// Genre tags
 		if (data.genre) {
-			const genreContainer = infoSection.createDiv({cls: 'audiobook-genre-container'});
+			const genreContainer = infoSection.createDiv({cls: 'media-genre-container'});
 			const genres = data.genre.split(',').map(g => g.trim());
 			genres.forEach(genre => {
 				genreContainer.createSpan({
-					cls: 'audiobook-genre-tag',
+					cls: 'media-genre-tag',
 					text: genre
 				});
 			});
@@ -373,9 +373,9 @@ export class AudiobookCardRenderer {
 
 		// Series
 		if (data.series) {
-			const seriesDiv = infoSection.createDiv({cls: 'audiobook-series'});
-			seriesDiv.createSpan({cls: 'audiobook-meta-icon', text: '📖'});
-			seriesDiv.createSpan({cls: 'audiobook-series-text', text: data.series});
+			const seriesDiv = infoSection.createDiv({cls: 'media-series'});
+			seriesDiv.createSpan({cls: 'media-meta-icon', text: '📖'});
+			seriesDiv.createSpan({cls: 'media-series-text', text: data.series});
 		}
 	}
 

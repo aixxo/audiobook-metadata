@@ -1,17 +1,17 @@
-import {AudiobookMetadata} from "../models/AudiobookMetadata";
-import {AudiobookPluginSettings, CustomFrontmatterField} from "../settings";
+import {MediaMetadata} from "../models/MediaMetadata";
+import {MediaPluginSettings, CustomFrontmatterField} from "../settings";
 import {getSortedCustomFields} from "../utils/TypeGuards";
 
 /**
  * Service for generating markdown files from audiobook metadata
  */
 export class MarkdownGenerator {
-	constructor(private settings: AudiobookPluginSettings) {}
+	constructor(private settings: MediaPluginSettings) {}
 
 	/**
 	 * Generate complete markdown content with frontmatter and audiobook code block
 	 */
-	generateMarkdown(metadata: AudiobookMetadata, useFrontmatter: boolean = true): string {
+	generateMarkdown(metadata: MediaMetadata, useFrontmatter: boolean = true): string {
 		let content = '';
 
 		if (useFrontmatter) {
@@ -27,7 +27,7 @@ export class MarkdownGenerator {
 	/**
 	 * Generate YAML frontmatter from metadata
 	 */
-	private generateFrontmatter(metadata: AudiobookMetadata): string {
+	private generateFrontmatter(metadata: MediaMetadata): string {
 		const lines: string[] = ['---'];
 
 		// Add custom fields at start if configured
@@ -86,7 +86,7 @@ export class MarkdownGenerator {
 
 		// Type/Subtype (for Obsidian Bases filtering)
 		lines.push('type: "book"');
-		lines.push('subtype: "audiobook"');
+		lines.push('subtype: "media"');
 
 		// Genres/Categories
 		if (metadata.genre && metadata.genre.length > 0) {
@@ -158,7 +158,7 @@ export class MarkdownGenerator {
 	/**
 	 * Generate markdown body content
 	 */
-	private generateBody(metadata: AudiobookMetadata): string {
+	private generateBody(metadata: MediaMetadata): string {
 		const sections: string[] = [];
 
 		// Title Header
@@ -168,8 +168,8 @@ export class MarkdownGenerator {
 		}
 		sections.push('');
 
-		// Audiobook card code block
-		sections.push(this.generateAudiobookCodeBlock(metadata));
+		// Media card code block
+		sections.push(this.generateMediaCodeBlock(metadata));
 		sections.push('');
 
 		// Description
@@ -190,11 +190,11 @@ export class MarkdownGenerator {
 	}
 
 	/**
-	 * Generate audiobook code block for rendering
+	 * Generate media code block for rendering
 	 * Since metadata is now in frontmatter, this creates a minimal trigger block
 	 */
-	private generateAudiobookCodeBlock(metadata: AudiobookMetadata): string {
-		const lines: string[] = ['```audiobook'];
+	private generateMediaCodeBlock(metadata: MediaMetadata): string {
+		const lines: string[] = ['```media'];
 		lines.push('# Card renders from frontmatter');
 		lines.push('# You can override individual fields here if needed');
 		lines.push('```');
@@ -257,7 +257,7 @@ export class MarkdownGenerator {
 	/**
 	 * Generate a safe filename from title
 	 */
-	generateFilename(metadata: AudiobookMetadata): string {
+	generateFilename(metadata: MediaMetadata): string {
 		let filename = metadata.title;
 
 		// Add author if available

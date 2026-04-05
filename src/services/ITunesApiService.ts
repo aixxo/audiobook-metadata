@@ -1,5 +1,5 @@
 import {IMetadataProvider} from "./IMetadataProvider";
-import {AudiobookMetadata, AudiobookSearchResult} from "../models/AudiobookMetadata";
+import {MediaMetadata, MediaSearchResult} from "../models/MediaMetadata";
 
 /**
  * iTunes API Provider (Placeholder)
@@ -17,17 +17,17 @@ export class ITunesApiService implements IMetadataProvider {
 		return url.includes('itunes.apple.com') || url.includes('books.apple.com');
 	}
 
-	async fetchByUrl(url: string): Promise<AudiobookMetadata | null> {
+	async fetchByUrl(url: string): Promise<MediaMetadata | null> {
 		// TODO: Extract iTunes ID and call fetchById
 		throw new Error('iTunes/Apple Books API is not yet implemented. Please use Google Books or switch to offline mode.');
 	}
 
-	async fetchById(id: string): Promise<AudiobookMetadata | null> {
+	async fetchById(id: string): Promise<MediaMetadata | null> {
 		// TODO: Implement iTunes lookup API call
 		throw new Error('iTunes/Apple Books API is not yet implemented. Please use Google Books or switch to offline mode.');
 	}
 
-	async search(query: string): Promise<AudiobookSearchResult[]> {
+	async search(query: string): Promise<MediaSearchResult[]> {
 		// TODO: Implement iTunes search with media=audiobook filter
 		throw new Error('iTunes/Apple Books API is not yet implemented. Please use Google Books or switch to offline mode.');
 	}

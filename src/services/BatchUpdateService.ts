@@ -1,5 +1,5 @@
 import {App, TFile} from "obsidian";
-import {AudiobookPluginSettings, CustomFrontmatterField} from "../settings";
+import {MediaPluginSettings, CustomFrontmatterField} from "../settings";
 import {getSortedCustomFields} from "../utils/TypeGuards";
 
 /**
@@ -18,13 +18,13 @@ export interface BatchUpdateResult {
 export class BatchUpdateService {
 	constructor(
 		private app: App,
-		private settings: AudiobookPluginSettings
+		private settings: MediaPluginSettings
 	) {}
 
 	/**
 	 * Get all markdown files in the default output folder
 	 */
-	async getAllAudiobookFiles(): Promise<TFile[]> {
+	async getAllMediaFiles(): Promise<TFile[]> {
 		const folder = this.settings.defaultOutputFolder;
 		const folderObj = this.app.vault.getAbstractFileByPath(folder);
 		
@@ -40,13 +40,13 @@ export class BatchUpdateService {
 	/**
 	 * Get all markdown files that have audiobook frontmatter (subtype: audiobook)
 	 */
-	async getAudiobookFiles(): Promise<TFile[]> {
+	async getMediaFiles(): Promise<TFile[]> {
 		const allFiles = this.app.vault.getMarkdownFiles();
 		const audiobookFiles: TFile[] = [];
 
 		for (const file of allFiles) {
 			const cache = this.app.metadataCache.getFileCache(file);
-			if (cache?.frontmatter?.subtype === 'audiobook') {
+			if (cache?.frontmatter?.subtype === 'media' || cache?.frontmatter?.subtype === 'audiobook') {
 				audiobookFiles.push(file);
 			}
 		}

@@ -1,16 +1,16 @@
 import {Plugin, Notice} from 'obsidian';
-import {DEFAULT_SETTINGS, DEFAULT_SERIES_SETTINGS, AudiobookPluginSettings, AudiobookSettingTab} from "./settings";
-import {AudiobookCardRenderer} from "./ui/AudiobookCardRenderer";
-import {AudiobookCommands} from "./commands/AudiobookCommands";
+import {DEFAULT_SETTINGS, DEFAULT_SERIES_SETTINGS, MediaPluginSettings, MediaSettingTab} from "./settings";
+import {MediaCardRenderer} from "./ui/MediaCardRenderer";
+import {MediaCommands} from "./commands/MediaCommands";
 import {SeriesCardRenderer} from "./ui/SeriesCardRenderer";
 import {SeriesCommands} from "./commands/SeriesCommands";
 import {CacheService, CacheData} from "./services/cache/CacheService";
 import {CacheCleanup} from "./services/cache/CacheCleanup";
 
-export default class AudiobookMetadataPlugin extends Plugin {
-	settings: AudiobookPluginSettings;
-	private cardRenderer: AudiobookCardRenderer;
-	private commands: AudiobookCommands;
+export default class MediaMetadataPlugin extends Plugin {
+	settings: MediaPluginSettings;
+	private cardRenderer: MediaCardRenderer;
+	private commands: MediaCommands;
 	private seriesCardRenderer: SeriesCardRenderer;
 	private seriesCommands: SeriesCommands;
 	private cacheService: CacheService;
@@ -37,13 +37,19 @@ export default class AudiobookMetadataPlugin extends Plugin {
 		this.cacheCleanup = new CacheCleanup(this.cacheService);
 		this.cacheCleanup.start((intervalId) => this.registerInterval(intervalId));
 
-		this.cardRenderer = new AudiobookCardRenderer(this.app);
-		this.commands = new AudiobookCommands(this.app, this.settings, this.cacheService);
+		this.cardRenderer = new MediaCardRenderer(this.app);
+		this.commands = new MediaCommands(this.app, this.settings, this.cacheService);
 
 		this.seriesCardRenderer = new SeriesCardRenderer(this.app);
 		this.seriesCommands = new SeriesCommands(this.app, this.settings.series, this.cacheService);
 
 		// Register markdown code block processor
+		this.registerMarkdownCodeBlockProcessor('media', async (source, el, ctx) => {
+			const data = this.cardRenderer.parseCodeBlock(source);
+			await this.cardRenderer.render(el, data, ctx);
+		});
+
+		// Backward compatibility: also register old 'audiobook' tag
 		this.registerMarkdownCodeBlockProcessor('audiobook', async (source, el, ctx) => {
 			const data = this.cardRenderer.parseCodeBlock(source);
 			await this.cardRenderer.render(el, data, ctx);
@@ -57,43 +63,43 @@ export default class AudiobookMetadataPlugin extends Plugin {
 
 		// Register commands
 		this.addCommand({
-			id: 'add-audiobook-from-url',
-			name: 'Add audiobook from URL',
+			id: 'add-media-from-url',
+			name: 'Add media from URL',
 			callback: async () => {
 				try {
 					await this.commands.addFromUrl();
 				} catch (error) {
 					console.error('Error in addFromUrl:', error);
 					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-					new Notice(`Failed to open audiobook modal: ${errorMessage}`);
+					new Notice(`Failed to open media modal: ${errorMessage}`);
 				}
 			}
 		});
 
 		this.addCommand({
-			id: 'add-audiobook-from-search',
-			name: 'Search and add audiobook',
+			id: 'add-media-from-search',
+			name: 'Search and add media',
 			callback: async () => {
 				try {
 					await this.commands.addFromSearch();
 				} catch (error) {
 					console.error('Error in addFromSearch:', error);
 					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-					new Notice(`Failed to open audiobook modal: ${errorMessage}`);
+					new Notice(`Failed to open media modal: ${errorMessage}`);
 				}
 			}
 		});
 
 		this.addCommand({
-			id: 'add-audiobook-from-id',
-			name: 'Add audiobook from identifier',
+			id: 'add-media-from-id',
+			name: 'Add media from identifier',
 			callback: async () => {
 				try {
 					await this.commands.addFromId();
 				} catch (error) {
 					console.error('Error in addFromId:', error);
 					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-					new Notice(`Failed to open audiobook modal: ${errorMessage}`);
+					new Notice(`Failed to open media modal: ${errorMessage}`);
 				}
 			}
 		});
@@ -170,7 +176,7 @@ export default class AudiobookMetadataPlugin extends Plugin {
 		});
 
 		// Add settings tab
-		this.addSettingTab(new AudiobookSettingTab(this.app, this));
+		this.addSettingTab(new MediaSettingTab(this.app, this));
 	}
 
 	onunload() {
@@ -178,7 +184,7 @@ export default class AudiobookMetadataPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		const saved = await this.loadData() as Partial<AudiobookPluginSettings> | null;
+		const saved = await this.loadData() as Partial<MediaPluginSettings> | null;
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, saved);
 		// Deep-merge series settings so new keys always have defaults
 		this.settings.series = Object.assign({}, DEFAULT_SERIES_SETTINGS, saved?.series);
