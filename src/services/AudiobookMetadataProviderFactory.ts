@@ -11,7 +11,7 @@ import {ITunesApiService} from "./ITunesApiService";
  * Factory for creating and wrapping metadata providers
  * Handles provider selection, rate limiting, and caching
  */
-export class MetadataProviderFactory {
+export class AudiobookMetadataProviderFactory {
 	private settings: MediaPluginSettings;
 	private cacheService: CacheService | null;
 	private rateLimiters: Map<string, RateLimiter> = new Map();

@@ -1,9 +1,9 @@
 import {App, MarkdownPostProcessorContext, TFile} from "obsidian";
 
 /**
- * Interface for media card data parsed from code block
+ * Interface for audiobook card data parsed from code block
  */
-export interface MediaCardData {
+export interface AudiobookCardData {
 	title?: string;
 	author?: string;
 	narrator?: string;
@@ -25,9 +25,9 @@ export interface MediaCardData {
 }
 
 /**
- * Renderer for media cards in markdown
+ * Renderer for audiobook cards in markdown
  */
-export class MediaCardRenderer {
+export class AudiobookCardRenderer {
 	constructor(private app: App) {}
 	
 	/**
@@ -48,8 +48,8 @@ export class MediaCardRenderer {
 	/**
 	 * Extract audiobook data from file frontmatter
 	 */
-	private extractFromFrontmatter(ctx: MarkdownPostProcessorContext): MediaCardData {
-		const data: MediaCardData = {};
+	private extractFromFrontmatter(ctx: MarkdownPostProcessorContext): AudiobookCardData {
+		const data: AudiobookCardData = {};
 		
 		// Get the file from the context
 		const file = this.app.vault.getAbstractFileByPath(ctx.sourcePath);
@@ -65,7 +65,7 @@ export class MediaCardRenderer {
 		
 		const fm = cache.frontmatter;
 		
-		// Map frontmatter fields to MediaCardData
+		// Map frontmatter fields to AudiobookCardData
 		if (fm.title) data.title = String(fm.title);
 		if (fm.subtitle) data.subtitle = String(fm.subtitle);
 		
@@ -132,8 +132,8 @@ export class MediaCardRenderer {
 	/**
 	 * Extract audiobook data from a linked note's frontmatter
 	 */
-	private extractFromLinkedFile(linkPath: string): MediaCardData {
-		const data: MediaCardData = {};
+	private extractFromLinkedFile(linkPath: string): AudiobookCardData {
+		const data: AudiobookCardData = {};
 
 		const file = this.app.metadataCache.getFirstLinkpathDest(linkPath, '');
 		if (!file || !(file instanceof TFile)) {
@@ -193,8 +193,8 @@ export class MediaCardRenderer {
 	/**
 	 * Parse YAML-like content from audiobook code block
 	 */
-	parseCodeBlock(source: string): MediaCardData {
-		const data: MediaCardData = {};
+	parseCodeBlock(source: string): AudiobookCardData {
+		const data: AudiobookCardData = {};
 		const lines = source.split('\n');
 
 		for (const line of lines) {
@@ -262,7 +262,7 @@ export class MediaCardRenderer {
 	/**
 	 * Render audiobook card in the markdown preview
 	 */
-	async render(el: HTMLElement, codeBlockData: MediaCardData, ctx: MarkdownPostProcessorContext): Promise<void> {
+	async render(el: HTMLElement, codeBlockData: AudiobookCardData, ctx: MarkdownPostProcessorContext): Promise<void> {
 		el.empty();
 
 		// Determine base data source: linked file or current file's frontmatter
@@ -272,7 +272,7 @@ export class MediaCardRenderer {
 			: this.extractFromFrontmatter(ctx);
 
 		// Merge base data with code block overrides (code block always wins)
-		const data: MediaCardData = {
+		const data: AudiobookCardData = {
 			...baseData,
 			...codeBlockOverrides
 		};

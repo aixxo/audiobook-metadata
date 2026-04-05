@@ -7,7 +7,7 @@ import {MediaPluginSettings} from "../settings";
 /**
  * Service for creating media markdown files in the vault
  */
-export class FileCreator {
+export class AudiobookFileCreator {
 	private markdownGenerator: MarkdownGenerator;
 	private imageDownloadService: ImageDownloadService;
 

@@ -1,24 +1,24 @@
 import {App, Notice} from "obsidian";
 import {MediaPluginSettings} from "../settings";
-import {MetadataProviderFactory} from "../services/MetadataProviderFactory";
-import {FileCreator} from "../services/FileCreator";
-import {MediaInputModal} from "../ui/MediaInputModal";
+import {AudiobookMetadataProviderFactory} from "../services/AudiobookMetadataProviderFactory";
+import {AudiobookFileCreator} from "../services/AudiobookFileCreator";
+import {AudiobookInputModal} from "../ui/AudiobookInputModal";
 import {CacheService} from "../services/cache/CacheService";
 
 /**
- * Handler for media-related commands
+ * Handler for audiobook-related commands
  */
-export class MediaCommands {
-	private providerFactory: MetadataProviderFactory;
-	private fileCreator: FileCreator;
+export class AudiobookCommands {
+	private providerFactory: AudiobookMetadataProviderFactory;
+	private fileCreator: AudiobookFileCreator;
 
 	constructor(
 		private app: App,
 		private settings: MediaPluginSettings,
 		private cacheService: CacheService
 	) {
-		this.providerFactory = new MetadataProviderFactory(settings, cacheService);
-		this.fileCreator = new FileCreator(app, settings);
+		this.providerFactory = new AudiobookMetadataProviderFactory(settings, cacheService);
+		this.fileCreator = new AudiobookFileCreator(app, settings);
 	}
 
 	/**
@@ -28,7 +28,7 @@ export class MediaCommands {
 		// Open modal with URL tab
 		const provider = this.providerFactory.getProvider();
 		
-		const modal = new MediaInputModal(
+		const modal = new AudiobookInputModal(
 			this.app,
 			provider,
 			this.settings.offlineMode,
@@ -54,7 +54,7 @@ export class MediaCommands {
 
 		const provider = this.providerFactory.getProvider();
 		
-		const modal = new MediaInputModal(
+		const modal = new AudiobookInputModal(
 			this.app,
 			provider,
 			this.settings.offlineMode,
@@ -80,7 +80,7 @@ export class MediaCommands {
 
 		const provider = this.providerFactory.getProvider();
 		
-		const modal = new MediaInputModal(
+		const modal = new AudiobookInputModal(
 			this.app,
 			provider,
 			this.settings.offlineMode,

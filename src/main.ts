@@ -1,7 +1,7 @@
 import {Plugin, Notice} from 'obsidian';
 import {DEFAULT_SETTINGS, DEFAULT_SERIES_SETTINGS, MediaPluginSettings, MediaSettingTab} from "./settings";
-import {MediaCardRenderer} from "./ui/MediaCardRenderer";
-import {MediaCommands} from "./commands/MediaCommands";
+import {AudiobookCardRenderer} from "./ui/AudiobookCardRenderer";
+import {AudiobookCommands} from "./commands/AudiobookCommands";
 import {SeriesCardRenderer} from "./ui/SeriesCardRenderer";
 import {SeriesCommands} from "./commands/SeriesCommands";
 import {CacheService, CacheData} from "./services/cache/CacheService";
@@ -9,8 +9,8 @@ import {CacheCleanup} from "./services/cache/CacheCleanup";
 
 export default class MediaMetadataPlugin extends Plugin {
 	settings: MediaPluginSettings;
-	private cardRenderer: MediaCardRenderer;
-	private commands: MediaCommands;
+	private cardRenderer: AudiobookCardRenderer;
+	private commands: AudiobookCommands;
 	private seriesCardRenderer: SeriesCardRenderer;
 	private seriesCommands: SeriesCommands;
 	private cacheService: CacheService;
@@ -37,19 +37,19 @@ export default class MediaMetadataPlugin extends Plugin {
 		this.cacheCleanup = new CacheCleanup(this.cacheService);
 		this.cacheCleanup.start((intervalId) => this.registerInterval(intervalId));
 
-		this.cardRenderer = new MediaCardRenderer(this.app);
-		this.commands = new MediaCommands(this.app, this.settings, this.cacheService);
+		this.cardRenderer = new AudiobookCardRenderer(this.app);
+		this.commands = new AudiobookCommands(this.app, this.settings, this.cacheService);
 
 		this.seriesCardRenderer = new SeriesCardRenderer(this.app);
 		this.seriesCommands = new SeriesCommands(this.app, this.settings.series, this.cacheService);
 
 		// Register markdown code block processor
-		this.registerMarkdownCodeBlockProcessor('media', async (source, el, ctx) => {
+		/*this.registerMarkdownCodeBlockProcessor('media', async (source, el, ctx) => {
 			const data = this.cardRenderer.parseCodeBlock(source);
 			await this.cardRenderer.render(el, data, ctx);
-		});
+		});*/
 
-		// Backward compatibility: also register old 'audiobook' tag
+		// Register 'audiobook' tag
 		this.registerMarkdownCodeBlockProcessor('audiobook', async (source, el, ctx) => {
 			const data = this.cardRenderer.parseCodeBlock(source);
 			await this.cardRenderer.render(el, data, ctx);

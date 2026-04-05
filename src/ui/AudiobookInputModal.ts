@@ -5,7 +5,7 @@ import {IMetadataProvider} from "../services/IMetadataProvider";
 /**
  * Modal for media input with multiple tabs
  */
-export class MediaInputModal extends Modal {
+export class AudiobookInputModal extends Modal {
 	private activeTab: 'url' | 'search' | 'id' | 'manual' = 'url';
 	private initialTab: 'url' | 'search' | 'id' | 'manual';
 	private tabContentContainer: HTMLElement;

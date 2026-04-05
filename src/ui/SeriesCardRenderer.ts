@@ -100,11 +100,11 @@ export class SeriesCardRenderer {
 
 		if (!data.title && !data.cover) return;
 
-		const card = el.createDiv({cls: 'audiobook-card series-card'});
+		const card = el.createDiv({cls: 'media-card series-card'});
 
 		// Cover section
 		if (data.cover) {
-			const coverSection = card.createDiv({cls: 'audiobook-cover-section'});
+			const coverSection = card.createDiv({cls: 'media-cover-section'});
 			let coverSrc = this.extractCoverPath(data.cover);
 
 			if (!coverSrc.startsWith('http://') && !coverSrc.startsWith('https://')) {
@@ -116,21 +116,21 @@ export class SeriesCardRenderer {
 			}
 
 			coverSection.createEl('img', {
-				cls: 'audiobook-cover',
+				cls: 'media-cover',
 				attr: {src: coverSrc, alt: data.title ?? 'Series cover'}
 			});
 		}
 
 		// Info section
-		const infoSection = card.createDiv({cls: 'audiobook-info'});
+		const infoSection = card.createDiv({cls: 'media-info'});
 
 		if (data.title) {
-			infoSection.createEl('h3', {cls: 'audiobook-title', text: data.title});
+			infoSection.createEl('h3', {cls: 'media-title', text: data.title});
 		}
 
 		// Status badge
 		if (data.status) {
-			const statusDiv = infoSection.createDiv({cls: 'audiobook-meta-item'});
+			const statusDiv = infoSection.createDiv({cls: 'media-meta-item'});
 			const isContinuing = data.status.toLowerCase().includes('running') ||
 				data.status.toLowerCase().includes('continuing') ||
 				data.status.toLowerCase().includes('in production');
@@ -141,44 +141,44 @@ export class SeriesCardRenderer {
 		}
 
 		if (data.network) {
-			const div = infoSection.createDiv({cls: 'audiobook-meta-item'});
-			div.createSpan({cls: 'audiobook-meta-icon', text: '📺'});
-			div.createSpan({cls: 'audiobook-meta-text', text: data.network});
+			const div = infoSection.createDiv({cls: 'media-meta-item'});
+			div.createSpan({cls: 'media-meta-icon', text: '📺'});
+			div.createSpan({cls: 'media-meta-text', text: data.network});
 		}
 
 		if (data.firstAired) {
-			const div = infoSection.createDiv({cls: 'audiobook-meta-item'});
-			div.createSpan({cls: 'audiobook-meta-icon', text: '📅'});
-			div.createSpan({cls: 'audiobook-meta-text', text: data.firstAired});
+			const div = infoSection.createDiv({cls: 'media-meta-item'});
+			div.createSpan({cls: 'media-meta-icon', text: '📅'});
+			div.createSpan({cls: 'media-meta-text', text: data.firstAired});
 		}
 
 		if (data.totalSeasons !== undefined || data.totalEpisodes !== undefined) {
-			const div = infoSection.createDiv({cls: 'audiobook-meta-item'});
-			div.createSpan({cls: 'audiobook-meta-icon', text: '🎬'});
+			const div = infoSection.createDiv({cls: 'media-meta-item'});
+			div.createSpan({cls: 'media-meta-icon', text: '🎬'});
 			const parts: string[] = [];
 			if (data.totalSeasons !== undefined) parts.push(`${data.totalSeasons} season${data.totalSeasons !== 1 ? 's' : ''}`);
 			if (data.totalEpisodes !== undefined) parts.push(`${data.totalEpisodes} episodes`);
-			div.createSpan({cls: 'audiobook-meta-text', text: parts.join(' · ')});
+			div.createSpan({cls: 'media-meta-text', text: parts.join(' · ')});
 		}
 
 		if (data.creator) {
-			const div = infoSection.createDiv({cls: 'audiobook-meta-item'});
-			div.createSpan({cls: 'audiobook-meta-icon', text: '✍️'});
-			div.createSpan({cls: 'audiobook-meta-text', text: data.creator});
+			const div = infoSection.createDiv({cls: 'media-meta-item'});
+			div.createSpan({cls: 'media-meta-icon', text: '✍️'});
+			div.createSpan({cls: 'media-meta-text', text: data.creator});
 		}
 
 		// Rating
 		if (data.rating !== undefined) {
-			const ratingDiv = infoSection.createDiv({cls: 'audiobook-rating'});
-			ratingDiv.createSpan({cls: 'audiobook-stars', text: this.renderStars(data.rating)});
-			ratingDiv.createSpan({cls: 'audiobook-rating-value', text: ` ${data.rating.toFixed(1)}`});
+			const ratingDiv = infoSection.createDiv({cls: 'media-rating'});
+			ratingDiv.createSpan({cls: 'media-stars', text: this.renderStars(data.rating)});
+			ratingDiv.createSpan({cls: 'media-rating-value', text: ` ${data.rating.toFixed(1)}`});
 		}
 
 		// Genre tags
 		if (data.genre) {
-			const genreContainer = infoSection.createDiv({cls: 'audiobook-genre-container'});
+			const genreContainer = infoSection.createDiv({cls: 'media-genre-container'});
 			data.genre.split(',').map(g => g.trim()).forEach(genre => {
-				genreContainer.createSpan({cls: 'audiobook-genre-tag', text: genre});
+				genreContainer.createSpan({cls: 'media-genre-tag', text: genre});
 			});
 		}
 	}
