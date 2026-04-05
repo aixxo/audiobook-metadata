@@ -1,5 +1,5 @@
 import {IMetadataProvider} from "./IMetadataProvider";
-import {MediaMetadata, MediaSearchResult} from "../models/AudiobookMetadata";
+import {AudiobookMetadata, AudiobookSearchResult} from "../models/AudiobookMetadata";
 import {requestUrl} from "obsidian";
 
 /**
@@ -57,7 +57,7 @@ export class GoogleBooksApiService implements IMetadataProvider {
 		return url.includes('books.google.') || url.includes('play.google.com/store/books');
 	}
 
-	async fetchByUrl(url: string): Promise<MediaMetadata | null> {
+	async fetchByUrl(url: string): Promise<AudiobookMetadata | null> {
 		// Extract book ID from Google Books URL
 		const idMatch = url.match(/id=([^&]+)/);
 		if (!idMatch || !idMatch[1]) {
@@ -68,7 +68,7 @@ export class GoogleBooksApiService implements IMetadataProvider {
 		return this.fetchById(idMatch[1]);
 	}
 
-	async fetchById(id: string): Promise<MediaMetadata | null> {
+	async fetchById(id: string): Promise<AudiobookMetadata | null> {
 		try {
 			const response = await requestUrl({
 				url: `${this.apiBaseUrl}/${id}`,
@@ -83,7 +83,7 @@ export class GoogleBooksApiService implements IMetadataProvider {
 		}
 	}
 
-	async search(query: string): Promise<MediaSearchResult[]> {
+	async search(query: string): Promise<AudiobookSearchResult[]> {
 		try {
 			const encodedQuery = encodeURIComponent(query);
 			const response = await requestUrl({
@@ -108,9 +108,9 @@ export class GoogleBooksApiService implements IMetadataProvider {
 	}
 
 	/**
-	 * Map Google Books API response to MediaMetadata
+	 * Map Google Books API response to AudiobookMetadata
 	 */
-	private mapToMediaMetadata(data: GoogleBooksItem): MediaMetadata {
+	private mapToMediaMetadata(data: GoogleBooksItem): AudiobookMetadata {
 		const volumeInfo = data.volumeInfo;
 		const saleInfo = data.saleInfo;
 

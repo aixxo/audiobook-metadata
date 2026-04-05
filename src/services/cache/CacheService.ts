@@ -1,10 +1,10 @@
-import {MediaMetadata} from "../../models/AudiobookMetadata";
+import {AudiobookMetadata} from "../../models/AudiobookMetadata";
 
 /**
  * Cache entry with TTL (Time To Live)
  */
 interface CacheEntry {
-	data: MediaMetadata;
+	data: AudiobookMetadata;
 	timestamp: number;
 	ttl: number; // in milliseconds
 }
@@ -76,7 +76,7 @@ export class CacheService {
 	 * @param id Resource ID (e.g., ASIN)
 	 * @returns Cached metadata or null if not found/expired
 	 */
-	get(provider: string, id: string): MediaMetadata | null {
+	get(provider: string, id: string): AudiobookMetadata | null {
 		const key = this.generateKey(provider, id);
 		const entry = this.cache.get(key);
 
@@ -104,7 +104,7 @@ export class CacheService {
 	async set(
 		provider: string,
 		id: string,
-		data: MediaMetadata,
+		data: AudiobookMetadata,
 		ttlHours?: number
 	): Promise<void> {
 		const key = this.generateKey(provider, id);

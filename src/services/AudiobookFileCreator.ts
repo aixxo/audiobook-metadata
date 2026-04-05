@@ -1,5 +1,5 @@
 import {App, Notice, TFile} from "obsidian";
-import {MediaMetadata} from "../models/AudiobookMetadata";
+import {AudiobookMetadata} from "../models/AudiobookMetadata";
 import {MarkdownGenerator} from "./MarkdownGenerator";
 import {ImageDownloadService} from "./ImageDownloadService";
 import {MediaPluginSettings} from "../settings";
@@ -22,7 +22,7 @@ export class AudiobookFileCreator {
 	/**
 	 * Create a new audiobook markdown file with metadata
 	 */
-	async createMediaFile(metadata: MediaMetadata): Promise<TFile | null> {
+	async createMediaFile(metadata: AudiobookMetadata): Promise<TFile | null> {
 		try {
 			// Generate filename
 			const filename = this.markdownGenerator.generateFilename(metadata);
@@ -76,7 +76,7 @@ export class AudiobookFileCreator {
 	/**
 	 * Update existing media file with new metadata
 	 */
-	async updateMediaFile(file: TFile, metadata: MediaMetadata): Promise<boolean> {
+	async updateMediaFile(file: TFile, metadata: AudiobookMetadata): Promise<boolean> {
 		try {
 			// Download cover if enabled
 			if (this.settings.coverStorage === 'local' && metadata.coverUrl) {

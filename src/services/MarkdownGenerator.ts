@@ -1,4 +1,4 @@
-import {MediaMetadata} from "../models/AudiobookMetadata";
+import {AudiobookMetadata} from "../models/AudiobookMetadata";
 import {MediaPluginSettings, CustomFrontmatterField} from "../settings";
 import {getSortedCustomFields} from "../utils/TypeGuards";
 
@@ -11,7 +11,7 @@ export class MarkdownGenerator {
 	/**
 	 * Generate complete markdown content with frontmatter and audiobook code block
 	 */
-	generateMarkdown(metadata: MediaMetadata, useFrontmatter: boolean = true): string {
+	generateMarkdown(metadata: AudiobookMetadata, useFrontmatter: boolean = true): string {
 		let content = '';
 
 		if (useFrontmatter) {
@@ -27,7 +27,7 @@ export class MarkdownGenerator {
 	/**
 	 * Generate YAML frontmatter from metadata
 	 */
-	private generateFrontmatter(metadata: MediaMetadata): string {
+	private generateFrontmatter(metadata: AudiobookMetadata): string {
 		const lines: string[] = ['---'];
 
 		// Add custom fields at start if configured
@@ -158,7 +158,7 @@ export class MarkdownGenerator {
 	/**
 	 * Generate markdown body content
 	 */
-	private generateBody(metadata: MediaMetadata): string {
+	private generateBody(metadata: AudiobookMetadata): string {
 		const sections: string[] = [];
 
 		// Title Header
@@ -193,7 +193,7 @@ export class MarkdownGenerator {
 	 * Generate media code block for rendering
 	 * Since metadata is now in frontmatter, this creates a minimal trigger block
 	 */
-	private generateMediaCodeBlock(metadata: MediaMetadata): string {
+	private generateMediaCodeBlock(metadata: AudiobookMetadata): string {
 		const lines: string[] = ['```media'];
 		lines.push('# Card renders from frontmatter');
 		lines.push('# You can override individual fields here if needed');
@@ -255,7 +255,7 @@ export class MarkdownGenerator {
 	/**
 	 * Generate a safe filename from title
 	 */
-	generateFilename(metadata: MediaMetadata): string {
+	generateFilename(metadata: AudiobookMetadata): string {
 		let filename = metadata.title;
 
 		// Add author if available
