@@ -217,7 +217,6 @@ export class MarkdownGenerator {
 		// Sort fields by order
 		const sortedFields = getSortedCustomFields(this.settings.customFrontmatterFields);
 
-		/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 		sortedFields.forEach((field: CustomFrontmatterField) => {
 			// Skip fields with empty keys
 			if (!field.key.trim()) {
@@ -249,7 +248,6 @@ export class MarkdownGenerator {
 
 			lines.push(`${key}: ${formattedValue}`);
 		});
-		/* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 
 		return lines;
 	}

@@ -76,7 +76,6 @@ export class BatchUpdateService {
 			const sortedFields = getSortedCustomFields(this.settings.customFrontmatterFields);
 
 			// Check which fields need to be added
-			/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 			sortedFields.forEach((field: CustomFrontmatterField) => {
 				const key = field.key.trim();
 				if (!key) return;
@@ -87,7 +86,6 @@ export class BatchUpdateService {
 					fieldsAdded++;
 				}
 			});
-			/* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 
 			if (fieldsAdded === 0) {
 				return {
@@ -204,15 +202,12 @@ export class BatchUpdateService {
 		const lines: string[] = ['---'];
 
 		// Determine position for custom fields
-		/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
 		const customFieldKeys = new Set(
 			getSortedCustomFields(this.settings.customFrontmatterFields).map((f: CustomFrontmatterField) => f.key.trim())
 		);
-		/* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
 
 		// Add fields at start if configured
 		if (this.settings.customFieldsPosition === 'start') {
-			/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 			getSortedCustomFields(this.settings.customFrontmatterFields).forEach((field: CustomFrontmatterField) => {
 				const key = field.key.trim();
 				if (key && key in frontmatter) {
@@ -220,7 +215,6 @@ export class BatchUpdateService {
 					delete frontmatter[key]; // Remove so we don't add it again
 				}
 			});
-			/* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 		}
 
 		// Add all other fields
@@ -231,14 +225,12 @@ export class BatchUpdateService {
 		}
 
 		if (this.settings.customFieldsPosition === 'end') {
-			/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 			getSortedCustomFields(this.settings.customFrontmatterFields).forEach((field: CustomFrontmatterField) => {
 				const key = field.key.trim();
 				if (key && key in frontmatter) {
 					lines.push(this.formatFrontmatterLine(key, frontmatter[key]));
 				}
 			});
-			/* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 		}
 
 		lines.push('---');

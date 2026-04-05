@@ -312,12 +312,14 @@ export class MediaSettingTab extends PluginSettingTab {
 		// ──────────────────────────────────────────────
 		// Series settings
 		// ──────────────────────────────────────────────
+		// eslint-disable-next-line obsidianmd/ui/sentence-case
 		new Setting(containerEl).setName('TV series').setHeading();
 
 		const s = this.plugin.settings.series;
 
 		new Setting(containerEl)
 			.setName('Output folder')
+			// eslint-disable-next-line obsidianmd/ui/sentence-case
 			.setDesc('Default folder for TV series metadata files')
 			.addText(text => text
 				.setPlaceholder('Series')
@@ -343,8 +345,10 @@ export class MediaSettingTab extends PluginSettingTab {
 
 			new Setting(containerEl)
 				.setName('API provider')
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
 				.setDesc('Service used for fetching TV series metadata')
 				.addDropdown(dropdown => dropdown
+					// eslint-disable-next-line obsidianmd/ui/sentence-case
 					.addOption('tvmaze', 'TVMaze (free, no key required)')
 					// eslint-disable-next-line obsidianmd/ui/sentence-case
 					.addOption('tmdb', 'TMDB – The Movie Database (API key required)')
@@ -357,9 +361,11 @@ export class MediaSettingTab extends PluginSettingTab {
 
 			if (s.seriesApiProvider === 'tmdb') {
 				new Setting(containerEl)
+					// eslint-disable-next-line obsidianmd/ui/sentence-case
 					.setName('TMDB API key')
 					.setDesc('Your API key from themoviedb.org')
 					.addText(text => text
+						// eslint-disable-next-line obsidianmd/ui/sentence-case
 						.setPlaceholder('Enter TMDB API key')
 						.setValue(s.tmdbApiKey)
 						.onChange(async (value) => {
@@ -368,9 +374,12 @@ export class MediaSettingTab extends PluginSettingTab {
 						}));
 
 				new Setting(containerEl)
+					// eslint-disable-next-line obsidianmd/ui/sentence-case
 					.setName('TMDB language')
+					// eslint-disable-next-line obsidianmd/ui/sentence-case
 					.setDesc('Language for TMDB responses in BCP 47 format (e.g. de-DE, en-US, fr-FR). Falls back to English if translation is unavailable.')
 					.addText(text => text
+						// eslint-disable-next-line obsidianmd/ui/sentence-case
 						.setPlaceholder('de-DE')
 						.setValue(s.tmdbLanguage)
 						.onChange(async (value) => {
@@ -453,7 +462,7 @@ export class MediaSettingTab extends PluginSettingTab {
 			.setDesc('How many files to create per series')
 			.addDropdown(dropdown => dropdown
 				.addOption('single', 'Single file (all seasons in one file)')
-				// eslint-disable-next-line obsidianmd/ui/sentence-case
+
 				.addOption('per-season', 'Per season (main file + one file per season)')
 				.setValue(s.seriesFileMode)
 				.onChange(async (value: SeriesFileMode) => {
@@ -466,7 +475,7 @@ export class MediaSettingTab extends PluginSettingTab {
 			.setDesc('How much episode information to include in the output')
 			.addDropdown(dropdown => dropdown
 				.addOption('full', 'Full (episode list per season)')
-				// eslint-disable-next-line obsidianmd/ui/sentence-case
+
 				.addOption('seasons-only', 'Seasons only (no episode list)')
 				.addOption('none', 'None (no season/episode section)')
 				.setValue(s.seriesEpisodeDetailLevel)

@@ -33,7 +33,6 @@ export class BatchUpdateModal extends Modal {
 		});
 
 		const fieldsList = infoDiv.createEl('ul');
-		/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
 		sortedFields.forEach((field: CustomFrontmatterField) => {
 			if (field.key.trim()) {
 				fieldsList.createEl('li', {
@@ -41,7 +40,6 @@ export class BatchUpdateModal extends Modal {
 				});
 			}
 		});
-		/* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
 
 		infoDiv.createEl('p', {
 			text: 'Only fields that do not already exist in the file will be added.',

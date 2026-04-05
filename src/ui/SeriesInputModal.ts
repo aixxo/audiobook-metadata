@@ -111,6 +111,7 @@ export class SeriesInputModal extends Modal {
 
 		new Setting(this.searchTabContent)
 			.setName('Search')
+			// eslint-disable-next-line obsidianmd/ui/sentence-case
 			.setDesc('Search for a TV series by title')
 			.addText(text => {
 				text.setPlaceholder('Series title');
@@ -140,8 +141,10 @@ export class SeriesInputModal extends Modal {
 
 		new Setting(this.idTabContent)
 			.setName('Series ID')
+			// eslint-disable-next-line obsidianmd/ui/sentence-case
 			.setDesc('Enter a TVMaze ID, TMDB ID, or IMDb ID (prefix with imdb: for IMDb IDs, e.g. imdb:tt0903747)')
 			.addText(text => {
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
 				text.setPlaceholder('e.g. 82   or   imdb:tt0903747');
 				text.onChange(value => idInput = value);
 				text.inputEl.addEventListener('keydown', (e) => {
@@ -191,8 +194,9 @@ export class SeriesInputModal extends Modal {
 			});
 
 		new Setting(this.manualTabContent)
-			.setName('Network / Platform')
+			.setName('Network / platform')
 			.addText(text => {
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
 				text.setPlaceholder('e.g. HBO, Netflix');
 				text.onChange(v => metadata.network = v);
 				addEnter(text);
@@ -201,7 +205,8 @@ export class SeriesInputModal extends Modal {
 		new Setting(this.manualTabContent)
 			.setName('Status')
 			.addText(text => {
-				text.setPlaceholder('e.g. Ended, Running');
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
+				text.setPlaceholder('e.g. Ended, running');
 				text.onChange(v => metadata.status = v);
 				addEnter(text);
 			});
@@ -209,6 +214,7 @@ export class SeriesInputModal extends Modal {
 		new Setting(this.manualTabContent)
 			.setName('First aired')
 			.addText(text => {
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
 				text.setPlaceholder('YYYY-MM-DD');
 				text.onChange(v => metadata.firstAired = v);
 				addEnter(text);
@@ -217,6 +223,7 @@ export class SeriesInputModal extends Modal {
 		new Setting(this.manualTabContent)
 			.setName('Cover URL')
 			.addText(text => {
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
 				text.setPlaceholder('https://...');
 				text.onChange(v => metadata.coverUrl = v);
 				addEnter(text);

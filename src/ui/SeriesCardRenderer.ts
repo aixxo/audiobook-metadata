@@ -219,33 +219,34 @@ export class SeriesCardRenderer {
 
 	private frontmatterToCardData(fm: Record<string, unknown>): SeriesCardData {
 		const data: SeriesCardData = {};
+		const str = (v: unknown): string => String(v as string | number | boolean);
 
-		if (fm.title) data.title = String(fm.title);
-		if (fm.overview) data.overview = String(fm.overview);
-		if (fm.status) data.status = String(fm.status);
-		if (fm.network) data.network = String(fm.network);
-		if (fm.first_aired) data.firstAired = String(fm.first_aired);
+		if (fm.title) data.title = str(fm.title);
+		if (fm.overview) data.overview = str(fm.overview);
+		if (fm.status) data.status = str(fm.status);
+		if (fm.network) data.network = str(fm.network);
+		if (fm.first_aired) data.firstAired = str(fm.first_aired);
 		if (fm.total_seasons !== undefined) data.totalSeasons = Number(fm.total_seasons);
 		if (fm.total_episodes !== undefined) data.totalEpisodes = Number(fm.total_episodes);
-		if (fm.language) data.language = String(fm.language);
+		if (fm.language) data.language = str(fm.language);
 		if (fm.rating !== undefined) data.rating = Number(fm.rating);
 		if (fm.creator) {
-			data.creator = Array.isArray(fm.creator) ? fm.creator.join(', ') : String(fm.creator);
+			data.creator = Array.isArray(fm.creator) ? (fm.creator as string[]).join(', ') : str(fm.creator);
 		}
 		if (fm.genre) {
-			data.genre = Array.isArray(fm.genre) ? fm.genre.join(', ') : String(fm.genre);
+			data.genre = Array.isArray(fm.genre) ? (fm.genre as string[]).join(', ') : str(fm.genre);
 		}
 		if (fm.cover) {
-			data.cover = this.extractCoverPath(String(fm.cover));
+			data.cover = this.extractCoverPath(str(fm.cover));
 		} else if (fm.coverUrl) {
-			data.cover = this.extractCoverPath(String(fm.coverUrl));
+			data.cover = this.extractCoverPath(str(fm.coverUrl));
 		} else if (fm.coverLocalPath) {
-			data.cover = this.extractCoverPath(String(fm.coverLocalPath));
+			data.cover = this.extractCoverPath(str(fm.coverLocalPath));
 		}
-		if (fm.imdb_id) data.imdbId = String(fm.imdb_id);
-		if (fm.tmdb_id) data.tmdbId = String(fm.tmdb_id);
-		if (fm.tvmaze_id) data.tvmazeId = String(fm.tvmaze_id);
-		if (fm.source_url) data.url = String(fm.source_url);
+		if (fm.imdb_id) data.imdbId = str(fm.imdb_id);
+		if (fm.tmdb_id) data.tmdbId = str(fm.tmdb_id);
+		if (fm.tvmaze_id) data.tvmazeId = str(fm.tvmaze_id);
+		if (fm.source_url) data.url = str(fm.source_url);
 
 		return data;
 	}

@@ -1,5 +1,5 @@
 import {TVSeriesMetadata, SeasonMetadata} from "../models/SeriesMetadata";
-import {SeriesPluginSettings, CustomFrontmatterField, CustomFieldsPosition} from "../settings";
+import {SeriesPluginSettings, CustomFrontmatterField} from "../settings";
 import {getSortedCustomFields} from "../utils/TypeGuards";
 
 /**
@@ -203,7 +203,6 @@ export class SeriesMarkdownGenerator {
 		const lines: string[] = [];
 		const sortedFields = getSortedCustomFields(this.settings.seriesCustomFrontmatterFields);
 
-		/* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 		sortedFields.forEach((field: CustomFrontmatterField) => {
 			if (!field.key.trim()) { return; }
 			const key = field.key.trim();
@@ -223,7 +222,6 @@ export class SeriesMarkdownGenerator {
 			}
 			lines.push(`${key}: ${formattedValue}`);
 		});
-		/* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 
 		return lines;
 	}
