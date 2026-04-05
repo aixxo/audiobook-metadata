@@ -1,33 +1,56 @@
 import {App, Modal, Notice, Setting, TFile} from "obsidian";
-import {BatchUpdateService, BatchUpdateResult} from "../services/BatchUpdateService";
+import {BatchUpdateService, BatchUpdateResult, BatchUpdateConfig} from "../services/BatchUpdateService";
 import {MediaPluginSettings, CustomFrontmatterField} from "../settings";
 import {getSortedCustomFields} from "../utils/TypeGuards";
 
 /**
- * Modal for batch updating existing audiobook files with custom frontmatter fields
+ * Modal for batch updating existing media files with custom frontmatter fields
  */
 export class BatchUpdateModal extends Modal {
 	private batchService: BatchUpdateService;
 	private settings: MediaPluginSettings;
+	private mode: 'audiobooks' | 'series';
 	private files: TFile[] = [];
 	private selectedFiles: Set<TFile> = new Set();
 	private isProcessing: boolean = false;
 
-	constructor(app: App, settings: MediaPluginSettings) {
+	constructor(app: App, settings: MediaPluginSettings, mode: 'audiobooks' | 'series' = 'audiobooks') {
 		super(app);
 		this.settings = settings;
-		this.batchService = new BatchUpdateService(app, settings);
+		this.mode = mode;
+
+		const config: BatchUpdateConfig = mode === 'series'
+			? {
+				fields: settings.series.seriesCustomFrontmatterFields,
+				fieldsPosition: settings.series.seriesCustomFieldsPosition,
+				outputFolder: settings.series.seriesOutputFolder,
+				typeFilter: { key: 'type', value: 'series' },
+			  }
+			: {
+				fields: settings.customFrontmatterFields,
+				fieldsPosition: settings.customFieldsPosition,
+				outputFolder: settings.defaultOutputFolder,
+				typeFilter: { key: 'subtype', value: 'audiobook' },
+			  };
+
+		this.batchService = new BatchUpdateService(app, settings, config);
 	}
 
 	async onOpen() {
 		const {contentEl} = this;
 		contentEl.empty();
 
-		contentEl.createEl('h2', {text: 'Batch update custom fields'});
+		const title = this.mode === 'series'
+			? 'Batch update series custom fields'
+			: 'Batch update custom fields';
+		contentEl.createEl('h2', {text: title});
 
 		// Info text
 		const infoDiv = contentEl.createDiv({cls: 'batch-update-info'});
-		const sortedFields = getSortedCustomFields(this.settings.customFrontmatterFields);
+		const activeFields = this.mode === 'series'
+			? this.settings.series.seriesCustomFrontmatterFields
+			: this.settings.customFrontmatterFields;
+		const sortedFields = getSortedCustomFields(activeFields);
 		infoDiv.createEl('p', {
 			text: `This will add the following ${sortedFields.length} custom field(s) to selected files:`
 		});
@@ -47,17 +70,21 @@ export class BatchUpdateModal extends Modal {
 		});
 
 		// Load files
-		contentEl.createEl('p', {text: 'Loading media files...'});
+		contentEl.createEl('p', {text: 'Loading files...'});
+		
+		const noFilesHint = this.mode === 'series'
+			? 'Files must have "type: series" in their frontmatter to be detected.'
+			: 'Files must have "subtype: audiobook" in their frontmatter to be detected.';
 		
 		try {
 			this.files = await this.batchService.getAllMediaFiles();
 			
 			if (this.files.length === 0) {
 				contentEl.empty();
-				contentEl.createEl('h2', {text: 'Batch update custom fields'});
-				contentEl.createEl('p', {text: 'No media files found in vault.'});
+				contentEl.createEl('h2', {text: title});
+				contentEl.createEl('p', {text: 'No files found in vault.'});
 				contentEl.createEl('p', {
-					text: 'Files must have "subtype: audiobook" in their frontmatter to be detected.',
+					text: noFilesHint,
 					cls: 'setting-item-description'
 				});
 				return;
@@ -79,7 +106,10 @@ export class BatchUpdateModal extends Modal {
 		const {contentEl} = this;
 		contentEl.empty();
 
-		contentEl.createEl('h2', {text: 'Batch update custom fields'});
+		const title = this.mode === 'series'
+			? 'Batch update series custom fields'
+			: 'Batch update custom fields';
+		contentEl.createEl('h2', {text: title});
 
 		// Summary
 		const summaryDiv = contentEl.createDiv({cls: 'batch-update-summary'});

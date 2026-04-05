@@ -557,6 +557,18 @@ export class MediaSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 					this.display();
 				}));
+
+		if (s.seriesCustomFrontmatterFields.length > 0) {
+			new Setting(containerEl)
+				.setName('Batch update')
+				.setDesc('Apply custom fields to existing series files')
+				.addButton(button => button
+					.setButtonText('Apply to existing files')
+					.onClick(() => {
+						const modal = new BatchUpdateModal(this.app, this.plugin.settings, 'series');
+						modal.open();
+					}));
+		}
 	}
 
 	private renderCustomFieldRow(tbody: HTMLTableSectionElement, fields: CustomFrontmatterField[], field: CustomFrontmatterField, index: number): void {

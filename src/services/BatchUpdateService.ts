@@ -1,5 +1,5 @@
 import {App, TFile} from "obsidian";
-import {MediaPluginSettings, CustomFrontmatterField} from "../settings";
+import {MediaPluginSettings, CustomFrontmatterField, CustomFieldsPosition} from "../settings";
 import {getSortedCustomFields} from "../utils/TypeGuards";
 
 /**
@@ -13,45 +13,58 @@ export interface BatchUpdateResult {
 }
 
 /**
- * Service for batch updating existing audiobook files with custom frontmatter fields
+ * Configuration for a batch update run (audiobooks or series)
+ */
+export interface BatchUpdateConfig {
+	fields: CustomFrontmatterField[];
+	fieldsPosition: CustomFieldsPosition;
+	outputFolder: string;
+	/** Frontmatter key/value used to identify target files, e.g. {key:'subtype', value:'audiobook'} */
+	typeFilter: { key: string; value: string };
+}
+
+/**
+ * Service for batch updating existing media files with custom frontmatter fields
  */
 export class BatchUpdateService {
+	private config: BatchUpdateConfig;
+
 	constructor(
 		private app: App,
-		private settings: MediaPluginSettings
-	) {}
-
-	/**
-	 * Get all markdown files in the default output folder
-	 */
-	async getAllMediaFiles(): Promise<TFile[]> {
-		const folder = this.settings.defaultOutputFolder;
-		const folderObj = this.app.vault.getAbstractFileByPath(folder);
-		
-		if (!folderObj || !(folderObj instanceof TFile)) {
-			// Get all files in folder
-			const allFiles = this.app.vault.getMarkdownFiles();
-			return allFiles.filter(file => file.path.startsWith(folder + '/'));
-		}
-		
-		return [];
+		settings: MediaPluginSettings,
+		config?: BatchUpdateConfig
+	) {
+		this.config = config ?? {
+			fields: settings.customFrontmatterFields,
+			fieldsPosition: settings.customFieldsPosition,
+			outputFolder: settings.defaultOutputFolder,
+			typeFilter: { key: 'subtype', value: 'audiobook' },
+		};
 	}
 
 	/**
-	 * Get all markdown files that have audiobook frontmatter (subtype: audiobook)
+	 * Get all markdown files that match the configured typeFilter frontmatter value
 	 */
-	async getMediaFiles(): Promise<TFile[]> {
+	async getAllMediaFiles(): Promise<TFile[]> {
 		const allFiles = this.app.vault.getMarkdownFiles();
-		const audiobookFiles: TFile[] = [];
+		const filtered: TFile[] = [];
 
 		for (const file of allFiles) {
 			const cache = this.app.metadataCache.getFileCache(file);
-			if (cache?.frontmatter?.subtype === 'media' || cache?.frontmatter?.subtype === 'audiobook') {
-				audiobookFiles.push(file);
+			const fmValue = cache?.frontmatter?.[this.config.typeFilter.key];
+			if (fmValue === this.config.typeFilter.value) {
+				filtered.push(file);
 			}
 		}
 
-		return audiobookFiles;
+		return filtered;
+	}
+
+	/**
+	 * @deprecated Use getAllMediaFiles() instead
+	 */
+	async getMediaFiles(): Promise<TFile[]> {
+		return this.getAllMediaFiles();
 	}
 
 	/**
@@ -73,7 +86,7 @@ export class BatchUpdateService {
 			}
 
 			let fieldsAdded = 0;
-			const sortedFields = getSortedCustomFields(this.settings.customFrontmatterFields);
+			const sortedFields = getSortedCustomFields(this.config.fields);
 
 			// Check which fields need to be added
 			sortedFields.forEach((field: CustomFrontmatterField) => {
@@ -203,12 +216,12 @@ export class BatchUpdateService {
 
 		// Determine position for custom fields
 		const customFieldKeys = new Set(
-			getSortedCustomFields(this.settings.customFrontmatterFields).map((f: CustomFrontmatterField) => f.key.trim())
+			getSortedCustomFields(this.config.fields).map((f: CustomFrontmatterField) => f.key.trim())
 		);
 
 		// Add fields at start if configured
-		if (this.settings.customFieldsPosition === 'start') {
-			getSortedCustomFields(this.settings.customFrontmatterFields).forEach((field: CustomFrontmatterField) => {
+		if (this.config.fieldsPosition === 'start') {
+			getSortedCustomFields(this.config.fields).forEach((field: CustomFrontmatterField) => {
 				const key = field.key.trim();
 				if (key && key in frontmatter) {
 					lines.push(this.formatFrontmatterLine(key, frontmatter[key]));
@@ -224,8 +237,8 @@ export class BatchUpdateService {
 			}
 		}
 
-		if (this.settings.customFieldsPosition === 'end') {
-			getSortedCustomFields(this.settings.customFrontmatterFields).forEach((field: CustomFrontmatterField) => {
+		if (this.config.fieldsPosition === 'end') {
+			getSortedCustomFields(this.config.fields).forEach((field: CustomFrontmatterField) => {
 				const key = field.key.trim();
 				if (key && key in frontmatter) {
 					lines.push(this.formatFrontmatterLine(key, frontmatter[key]));
